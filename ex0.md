@@ -16,7 +16,7 @@ s(z)
 | Type τ | nat             | nat             | naturals
 | Expr e | z               | z               | zero
 |        | s(e)            | s(e)            | successor
-|        | num[n]          | n               | numerals
+|        | nat[n]          | n               | numerals
 
 ## Statics
 
