@@ -6,7 +6,7 @@ For example:
 
 ```
 s(z)
-↦ num[1]
+↦ nat[1]
 ```
 
 ## Syntax Chart
@@ -28,7 +28,7 @@ _TODO_
 ```
 ```
 ----------------
-Γ ⊢ num[n] : nat
+Γ ⊢ nat[n] : nat
 ```
 ```
  Γ ⊢ e : nat
