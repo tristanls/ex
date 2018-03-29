@@ -83,13 +83,21 @@ const typePrototype =
         {
             return EX.false; // nothing inhabits Void type
         }
+
+        // Current convention implies that an instance of any type inhabits
+        // EX.Unit type. There are apparently A Lot™ of consequences of this
+        // design which may not be readily apparent or intended. This note is
+        // a bookmark acknowledging unexplored consequences.
+
         for (let entry of Object.entries(type.prototype)
                                 .filter(entry => entry[1] instanceof Function))
         {
+
             // Currently working under the convention that if a prototype method
             // has the same name, it implies the same signature, i.e. argument
             // types are compatible and return type is compatible. If this
             // convention is violated, type inhabitance check needs to be updated.
+
             if (!(this[entry[0]] instanceof Function))
             {
                 return EX.false;
