@@ -41,6 +41,8 @@ EX.Judgment = ex.Type(Object.assign({},
             this._subjects = subjects;
             this._value = this; // judgement value is itself
         },
+        // TODO: get rid of accessors once there are distinguishable things
+        //       to "do" with judgments
         form()
         {
             return this._form;
@@ -68,6 +70,8 @@ EX.Rule = ex.Type(Object.assign({},
             this._premises = premises;
             this._value = this; // rule value is itself
         },
+        // TODO: get rid of accessors once there are distinguishable things
+        //       to "do" with rules
         conclusion()
         {
             return this._conclusion;
