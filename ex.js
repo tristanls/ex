@@ -2,7 +2,7 @@
 
 const EX = module.exports;
 
-function deepFreeze(obj)
+EX.deepFreeze = function deepFreeze(obj)
 {
     Object.getOwnPropertyNames(obj).map(name =>
         {
@@ -145,7 +145,7 @@ EX.Unit = EX.Type(Object.assign({},
             if (EX.null === undefined)
             {
                 this._value = null;
-                EX.null = deepFreeze(this);
+                EX.null = EX.deepFreeze(this);
             }
             return EX.null;
         }
@@ -167,7 +167,7 @@ EX.Boolean = EX.Type(Object.assign({},
                 if (EX.true === undefined)
                 {
                     this._value = true;
-                    EX.true = deepFreeze(this);
+                    EX.true = EX.deepFreeze(this);
                 }
                 return EX.true;
             }
@@ -176,7 +176,7 @@ EX.Boolean = EX.Type(Object.assign({},
                 if (EX.false === undefined)
                 {
                     this._value = false;
-                    EX.false = deepFreeze(this);
+                    EX.false = EX.deepFreeze(this);
                 }
                 return EX.false;
             }
@@ -331,4 +331,4 @@ EX.selfTest = (function ()
     }
 })();
 
-deepFreeze(EX);
+EX.deepFreeze(EX);
