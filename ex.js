@@ -30,7 +30,15 @@ EX.assert = function assert(predicate, message)
     {
         throw new Error(message);
     }
-}
+};
+
+EX.deny = function deny(predicate, message)
+{
+    if (predicate !== EX.false)
+    {
+        throw new Error(message);
+    }
+};
 
 const valuePrototype =
 {
@@ -186,147 +194,139 @@ EX.selfTest = (function ()
         // Type
         EX.assert(EX.Type.hasType(EX.Type));
         EX.assert(EX.Type.hasType(EX.Value));
-        // TODO: requires "not" operator (i.e. need boolean logic)
-        // EX.assert(EX.Type.hasType(EX.Void).not());
-        // EX.assert(EX.Type.hasType(EX.Unit).not());
-        // EX.assert(EX.Type.hasType(EX.Boolean).not());
+        EX.deny(EX.Type.hasType(EX.Void));
+        EX.deny(EX.Type.hasType(EX.Unit));
+        // TODO: Boolean type is currently indistinguishable
+        // EX.deny(EX.Type.hasType(EX.Boolean));
 
         EX.assert(EX.Type.equals(EX.Type));
-        // TODO: requires "not" operator (i.e. need boolean logic)
-        // EX.assert(EX.Type.equals(EX.Value).not());
-        // EX.assert(EX.Type.equals(EX.Void).not());
-        // EX.assert(EX.Type.equals(EX.Unit).not());
-        // EX.assert(EX.Type.equals(EX.Boolean).not());
+        EX.deny(EX.Type.equals(EX.Value));
+        EX.deny(EX.Type.equals(EX.Void));
+        EX.deny(EX.Type.equals(EX.Unit));
+        // TODO: Boolean type is currently indistinguishable
+        // EX.deny(EX.Type.equals(EX.Boolean));
 
         EX.assert(type.hasType(EX.Type));
         EX.assert(type.hasType(EX.Value));
-        // TODO: requires "not" operator (i.e. need boolean logic)
-        // EX.assert(type.hasType(EX.Void).not());
-        // EX.assert(type.hasType(EX.Unit).not());
-        // EX.assert(type.hasType(EX.Boolean).not());
+        EX.deny(type.hasType(EX.Void));
+        EX.deny(type.hasType(EX.Unit));
+        // TODO: Boolean type is currently indistinguishable
+        // EX.deny(type.hasType(EX.Boolean));
 
         EX.assert(type.equals(type));
-        // TODO: requires "not" operator (i.e. need boolean logic)
-        // EX.assert(type.equals(value).not());
-        // EX.assert(type.equals(EX.null).not());
-        // EX.assert(type.equals(EX.true).not());
-        // EX.assert(type.equals(EX.false).not());
+        EX.deny(type.equals(value));
+        EX.deny(type.equals(EX.null));
+        EX.deny(type.equals(EX.true));
+        EX.deny(type.equals(EX.false));
 
         // Value
         EX.assert(EX.Value.hasType(EX.Type));
         EX.assert(EX.Value.hasType(EX.Value));
-        // TODO: requires "not" operator (i.e. need boolean logic)
-        // EX.assert(EX.Value.hasType(EX.Void).not());
-        // EX.assert(EX.Value.hasType(EX.Unit).not());
-        // EX.assert(EX.Value.hasType(EX.Boolean).not());
+        EX.deny(EX.Value.hasType(EX.Void));
+        EX.deny(EX.Value.hasType(EX.Unit));
+        // TODO: Boolean type is currently indistinguishable
+        // EX.deny(EX.Value.hasType(EX.Boolean));
 
         EX.assert(EX.Value.equals(EX.Value));
-        // TODO: requires "not" operator (i.e. need boolean logic)
-        // EX.assert(EX.Value.equals(EX.Type).not());
-        // EX.assert(EX.Value.equals(EX.Void).not());
-        // EX.assert(EX.Value.equals(EX.Unit).not());
-        // EX.assert(EX.Value.equals(EX.Boolean).not());
+        EX.deny(EX.Value.equals(EX.Type));
+        EX.deny(EX.Value.equals(EX.Void));
+        EX.deny(EX.Value.equals(EX.Unit));
+        // TODO: Boolean type is currently indistinguishable
+        // EX.deny(EX.Value.equals(EX.Boolean));
 
         EX.assert(value.hasType(EX.Type));
         EX.assert(value.hasType(EX.Value));
-        // TODO: requires "not" operator (i.e. need boolean logic)
-        // EX.assert(value.hasType(EX.Void).not());
-        // EX.assert(value.hasType(EX.Unit).not());
-        // EX.assert(value.hasType(EX.Boolean).not());
+        EX.deny(value.hasType(EX.Void));
+        EX.deny(value.hasType(EX.Unit));
+        // TODO: Boolean type is currently indistinguishable
+        // EX.deny(value.hasType(EX.Boolean));
 
         EX.assert(value.equals(value));
-        // TODO: requires "not" operator (i.e. need boolean logic)
-        // EX.assert(value.equals(type).not());
-        // EX.assert(value.equals(EX.null).not());
-        // EX.assert(value.equals(EX.true).not());
-        // EX.assert(value.equals(EX.false).not());
+        EX.deny(value.equals(type));
+        EX.deny(value.equals(EX.null));
+        EX.deny(value.equals(EX.true));
+        EX.deny(value.equals(EX.false));
 
         // Void
         EX.assert(EX.Void.hasType(EX.Type));
         EX.assert(EX.Void.hasType(EX.Value));
-        // TODO: requires "not" operator (i.e. need boolean logic)
-        // EX.assert(EX.Void.hasType(EX.Void).not());
-        // EX.assert(EX.Void.hasType(EX.Unit).not());
-        // EX.assert(EX.Void.hasType(EX.Boolean).not());
+        EX.deny(EX.Void.hasType(EX.Void));
+        EX.deny(EX.Void.hasType(EX.Unit));
+        // TODO: Boolean type is currently indistinguishable
+        // EX.deny(EX.Void.hasType(EX.Boolean));
 
         EX.assert(EX.Void.equals(EX.Void));
-        // TODO: requires "not" operator (i.e. need boolean logic)
-        // EX.assert(EX.Void.equals(EX.Type).not());
-        // EX.assert(EX.Void.equals(EX.Value).not());
-        // EX.assert(EX.Void.equals(EX.Unit).not());
-        // EX.assert(EX.Void.equals(EX.Boolean).not());
+        EX.deny(EX.Void.equals(EX.Type));
+        EX.deny(EX.Void.equals(EX.Value));
+        EX.deny(EX.Void.equals(EX.Unit));
+        // TODO: Boolean type is currently indistinguishable
+        // EX.deny(EX.Void.equals(EX.Boolean));
 
         // Unit
         EX.assert(EX.Unit.hasType(EX.Type));
         EX.assert(EX.Unit.hasType(EX.Value));
-        // TODO: requires "not" operator (i.e. need boolean logic)
-        // EX.assert(EX.Unit.hasType(EX.Void).not());
-        // EX.assert(EX.Unit.hasType(EX.Unit).not());
-        // EX.assert(EX.Unit.hasType(EX.Boolean).not());
+        EX.deny(EX.Unit.hasType(EX.Void));
+        EX.deny(EX.Unit.hasType(EX.Unit));
+        // TODO: Boolean type is currently indistinguishable
+        // EX.deny(EX.Unit.hasType(EX.Boolean));
 
         EX.assert(EX.Unit.equals(EX.Unit));
-        // TODO: requires "not" operator (i.e. need boolean logic)
-        // EX.assert(EX.Unit.equals(EX.Type).not());
-        // EX.assert(EX.Unit.equals(EX.Value).not());
-        // EX.assert(EX.Unit.equals(EX.Void).not());
-        // EX.assert(EX.Unit.equals(EX.Boolean).not());
+        EX.deny(EX.Unit.equals(EX.Type));
+        EX.deny(EX.Unit.equals(EX.Value));
+        EX.deny(EX.Unit.equals(EX.Void));
+        // TODO: Boolean type is currently indistinguishable
+        // EX.deny(EX.Unit.equals(EX.Boolean));
 
         EX.assert(EX.null.hasType(EX.Type));
         EX.assert(EX.null.hasType(EX.Value));
         EX.assert(EX.null.hasType(EX.Unit));
-        // TODO: requires "not" operator (i.e. need boolean logic)
-        // EX.assert(EX.null.hasType(EX.Void).not());
-        // EX.assert(EX.null.hasType(EX.Boolean).not());
+        EX.deny(EX.null.hasType(EX.Void));
+        // TODO: Boolean type is currently indistinguishable
+        // EX.deny(EX.null.hasType(EX.Boolean));
 
         EX.assert(EX.null.equals(EX.null));
-        // TODO: requires "not" operator (i.e. need boolean logic)
-        // EX.assert(EX.null.equals(type).not());
-        // EX.assert(EX.null.equals(value).not());
-        // EX.assert(EX.null.equals(EX.true).not());
-        // EX.assert(EX.null.equals(EX.false).not());
+        EX.deny(EX.null.equals(type));
+        EX.deny(EX.null.equals(value));
+        EX.deny(EX.null.equals(EX.true));
+        EX.deny(EX.null.equals(EX.false));
 
         // Boolean
         EX.assert(EX.Boolean.hasType(EX.Type));
         EX.assert(EX.Boolean.hasType(EX.Value));
-        // TODO: requires "not" operator (i.e. need boolean logic)
-        // EX.assert(EX.Boolean.hasType(EX.Void).not());
-        // EX.assert(EX.Boolean.hasType(EX.Unit).not());
-        // EX.assert(EX.Boolean.hasType(EX.Boolean).not());
+        EX.deny(EX.Boolean.hasType(EX.Void));
+        EX.deny(EX.Boolean.hasType(EX.Unit));
+        // TODO: Boolean type is currently indistinguishable
+        // EX.deny(EX.Boolean.hasType(EX.Boolean));
 
         EX.assert(EX.Boolean.equals(EX.Boolean));
-        // TODO: requires "not" operator (i.e. need boolean logic)
-        // EX.assert(EX.Boolean.equals(EX.Type).not());
-        // EX.assert(EX.Boolean.equals(EX.Value).not());
-        // EX.assert(EX.Boolean.equals(EX.Void).not());
-        // EX.assert(EX.Boolean.equals(EX.Unit).not());
+        EX.deny(EX.Boolean.equals(EX.Type));
+        EX.deny(EX.Boolean.equals(EX.Value));
+        EX.deny(EX.Boolean.equals(EX.Void));
+        EX.deny(EX.Boolean.equals(EX.Unit));
 
         EX.assert(EX.true.hasType(EX.Type));
         EX.assert(EX.true.hasType(EX.Value));
         EX.assert(EX.true.hasType(EX.Boolean));
-        // TODO: requires "not" operator (i.e. need boolean logic)
-        // EX.assert(EX.true.hasType(EX.Void).not());
-        // EX.assert(EX.true.hasType(EX.Unit).not());
+        EX.deny(EX.true.hasType(EX.Void));
+        EX.deny(EX.true.hasType(EX.Unit));
 
         EX.assert(EX.true.equals(EX.true));
-        // TODO: requires "not" operator (i.e. need boolean logic)
-        // EX.assert(EX.true.equals(type).not());
-        // EX.assert(EX.true.equals(value).not());
-        // EX.assert(EX.true.equals(EX.null).not());
-        // EX.assert(EX.true.equals(EX.false).not());
+        EX.deny(EX.true.equals(type));
+        EX.deny(EX.true.equals(value));
+        EX.deny(EX.true.equals(EX.null));
+        EX.deny(EX.true.equals(EX.false));
 
         EX.assert(EX.false.hasType(EX.Type));
         EX.assert(EX.false.hasType(EX.Value));
         EX.assert(EX.false.hasType(EX.Boolean));
-        // TODO: requires "not" operator (i.e. need boolean logic)
-        // EX.assert(EX.false.hasType(EX.Void).not());
-        // EX.assert(EX.false.hasType(EX.Unit).not());
+        EX.deny(EX.false.hasType(EX.Void));
+        EX.deny(EX.false.hasType(EX.Unit));
 
         EX.assert(EX.false.equals(EX.false));
-        // TODO: requires "not" operator (i.e. need boolean logic)
-        // EX.assert(EX.false.equals(type).not());
-        // EX.assert(EX.false.equals(value).not());
-        // EX.assert(EX.false.equals(EX.null).not());
-        // EX.assert(EX.false.equals(EX.true).not());
+        EX.deny(EX.false.equals(type));
+        EX.deny(EX.false.equals(value));
+        EX.deny(EX.false.equals(EX.null));
+        EX.deny(EX.false.equals(EX.true));
     }
 })();
 
