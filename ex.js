@@ -2,12 +2,6 @@
 
 const EX = module.exports;
 
-let _ordinal = -1;
-function ordinal()
-{
-    return ++_ordinal;
-};
-
 function deepFreeze(obj)
 {
     Object.getOwnPropertyNames(obj).map(name =>
@@ -83,19 +77,16 @@ const typePrototype =
         newType.constructor.prototype = newType;
         return newType.constructor;
     },
-    hasType(type)
+    inhabitsType(type)
     {
+        if (type === EX.Void)
+        {
+            return EX.false; // nothing inhabits Void type
+        }
         for (let entry of Object.entries(type.prototype)
                                 .filter(entry => entry[1] instanceof Function))
         {
             if (!(this[entry[0]] instanceof Function))
-            {
-                return EX.false;
-            }
-        }
-        if (type.prototype.distinguished !== undefined)
-        {
-            if (this.distinguished !== type.prototype.distinguished)
             {
                 return EX.false;
             }
@@ -123,10 +114,9 @@ EX.Value = EX.Type(valuePrototype);
 EX.Void = EX.Type(Object.assign({},
     EX.Type.prototype,
     {
-        distinguished: ordinal(),
         constructor: function Void()
         {
-            throw new Error("Void type has no instances");
+            throw new Error("Void type has no inhabitants");
         }
     }
 ));
@@ -134,7 +124,6 @@ EX.Void = EX.Type(Object.assign({},
 EX.Unit = EX.Type(Object.assign({},
     EX.Type.prototype,
     {
-        distinguished: ordinal(),
         constructor: function Unit()
         {
             if (!(this instanceof Unit))
@@ -192,12 +181,12 @@ EX.selfTest = (function ()
     return function selfTest()
     {
         // Type
-        EX.assert(EX.Type.hasType(EX.Type));
-        EX.assert(EX.Type.hasType(EX.Value));
-        EX.deny(EX.Type.hasType(EX.Void));
-        EX.deny(EX.Type.hasType(EX.Unit));
+        EX.assert(EX.Type.inhabitsType(EX.Type));
+        EX.assert(EX.Type.inhabitsType(EX.Value));
+        EX.deny(EX.Type.inhabitsType(EX.Void));
+        EX.assert(EX.Type.inhabitsType(EX.Unit));
         // TODO: Boolean type is currently indistinguishable
-        // EX.deny(EX.Type.hasType(EX.Boolean));
+        // EX.deny(EX.Type.inhabitsType(EX.Boolean));
 
         EX.assert(EX.Type.equals(EX.Type));
         EX.deny(EX.Type.equals(EX.Value));
@@ -206,12 +195,12 @@ EX.selfTest = (function ()
         // TODO: Boolean type is currently indistinguishable
         // EX.deny(EX.Type.equals(EX.Boolean));
 
-        EX.assert(type.hasType(EX.Type));
-        EX.assert(type.hasType(EX.Value));
-        EX.deny(type.hasType(EX.Void));
-        EX.deny(type.hasType(EX.Unit));
+        EX.assert(type.inhabitsType(EX.Type));
+        EX.assert(type.inhabitsType(EX.Value));
+        EX.deny(type.inhabitsType(EX.Void));
+        EX.assert(type.inhabitsType(EX.Unit));
         // TODO: Boolean type is currently indistinguishable
-        // EX.deny(type.hasType(EX.Boolean));
+        // EX.deny(type.inhabitsType(EX.Boolean));
 
         EX.assert(type.equals(type));
         EX.deny(type.equals(value));
@@ -220,12 +209,12 @@ EX.selfTest = (function ()
         EX.deny(type.equals(EX.false));
 
         // Value
-        EX.assert(EX.Value.hasType(EX.Type));
-        EX.assert(EX.Value.hasType(EX.Value));
-        EX.deny(EX.Value.hasType(EX.Void));
-        EX.deny(EX.Value.hasType(EX.Unit));
+        EX.assert(EX.Value.inhabitsType(EX.Type));
+        EX.assert(EX.Value.inhabitsType(EX.Value));
+        EX.deny(EX.Value.inhabitsType(EX.Void));
+        EX.assert(EX.Value.inhabitsType(EX.Unit));
         // TODO: Boolean type is currently indistinguishable
-        // EX.deny(EX.Value.hasType(EX.Boolean));
+        // EX.deny(EX.Value.inhabitsType(EX.Boolean));
 
         EX.assert(EX.Value.equals(EX.Value));
         EX.deny(EX.Value.equals(EX.Type));
@@ -234,12 +223,12 @@ EX.selfTest = (function ()
         // TODO: Boolean type is currently indistinguishable
         // EX.deny(EX.Value.equals(EX.Boolean));
 
-        EX.assert(value.hasType(EX.Type));
-        EX.assert(value.hasType(EX.Value));
-        EX.deny(value.hasType(EX.Void));
-        EX.deny(value.hasType(EX.Unit));
+        EX.assert(value.inhabitsType(EX.Type));
+        EX.assert(value.inhabitsType(EX.Value));
+        EX.deny(value.inhabitsType(EX.Void));
+        EX.assert(value.inhabitsType(EX.Unit));
         // TODO: Boolean type is currently indistinguishable
-        // EX.deny(value.hasType(EX.Boolean));
+        // EX.deny(value.inhabitsType(EX.Boolean));
 
         EX.assert(value.equals(value));
         EX.deny(value.equals(type));
@@ -248,12 +237,12 @@ EX.selfTest = (function ()
         EX.deny(value.equals(EX.false));
 
         // Void
-        EX.assert(EX.Void.hasType(EX.Type));
-        EX.assert(EX.Void.hasType(EX.Value));
-        EX.deny(EX.Void.hasType(EX.Void));
-        EX.deny(EX.Void.hasType(EX.Unit));
+        EX.assert(EX.Void.inhabitsType(EX.Type));
+        EX.assert(EX.Void.inhabitsType(EX.Value));
+        EX.deny(EX.Void.inhabitsType(EX.Void));
+        EX.assert(EX.Void.inhabitsType(EX.Unit));
         // TODO: Boolean type is currently indistinguishable
-        // EX.deny(EX.Void.hasType(EX.Boolean));
+        // EX.deny(EX.Void.inhabitsType(EX.Boolean));
 
         EX.assert(EX.Void.equals(EX.Void));
         EX.deny(EX.Void.equals(EX.Type));
@@ -263,12 +252,12 @@ EX.selfTest = (function ()
         // EX.deny(EX.Void.equals(EX.Boolean));
 
         // Unit
-        EX.assert(EX.Unit.hasType(EX.Type));
-        EX.assert(EX.Unit.hasType(EX.Value));
-        EX.deny(EX.Unit.hasType(EX.Void));
-        EX.deny(EX.Unit.hasType(EX.Unit));
+        EX.assert(EX.Unit.inhabitsType(EX.Type));
+        EX.assert(EX.Unit.inhabitsType(EX.Value));
+        EX.deny(EX.Unit.inhabitsType(EX.Void));
+        EX.assert(EX.Unit.inhabitsType(EX.Unit));
         // TODO: Boolean type is currently indistinguishable
-        // EX.deny(EX.Unit.hasType(EX.Boolean));
+        // EX.deny(EX.Unit.inhabitsType(EX.Boolean));
 
         EX.assert(EX.Unit.equals(EX.Unit));
         EX.deny(EX.Unit.equals(EX.Type));
@@ -277,12 +266,12 @@ EX.selfTest = (function ()
         // TODO: Boolean type is currently indistinguishable
         // EX.deny(EX.Unit.equals(EX.Boolean));
 
-        EX.assert(EX.null.hasType(EX.Type));
-        EX.assert(EX.null.hasType(EX.Value));
-        EX.assert(EX.null.hasType(EX.Unit));
-        EX.deny(EX.null.hasType(EX.Void));
+        EX.assert(EX.null.inhabitsType(EX.Type));
+        EX.assert(EX.null.inhabitsType(EX.Value));
+        EX.assert(EX.null.inhabitsType(EX.Unit));
+        EX.deny(EX.null.inhabitsType(EX.Void));
         // TODO: Boolean type is currently indistinguishable
-        // EX.deny(EX.null.hasType(EX.Boolean));
+        // EX.deny(EX.null.inhabitsType(EX.Boolean));
 
         EX.assert(EX.null.equals(EX.null));
         EX.deny(EX.null.equals(type));
@@ -291,12 +280,12 @@ EX.selfTest = (function ()
         EX.deny(EX.null.equals(EX.false));
 
         // Boolean
-        EX.assert(EX.Boolean.hasType(EX.Type));
-        EX.assert(EX.Boolean.hasType(EX.Value));
-        EX.deny(EX.Boolean.hasType(EX.Void));
-        EX.deny(EX.Boolean.hasType(EX.Unit));
+        EX.assert(EX.Boolean.inhabitsType(EX.Type));
+        EX.assert(EX.Boolean.inhabitsType(EX.Value));
+        EX.deny(EX.Boolean.inhabitsType(EX.Void));
+        EX.assert(EX.Boolean.inhabitsType(EX.Unit));
         // TODO: Boolean type is currently indistinguishable
-        // EX.deny(EX.Boolean.hasType(EX.Boolean));
+        // EX.deny(EX.Boolean.inhabitsType(EX.Boolean));
 
         EX.assert(EX.Boolean.equals(EX.Boolean));
         EX.deny(EX.Boolean.equals(EX.Type));
@@ -304,11 +293,11 @@ EX.selfTest = (function ()
         EX.deny(EX.Boolean.equals(EX.Void));
         EX.deny(EX.Boolean.equals(EX.Unit));
 
-        EX.assert(EX.true.hasType(EX.Type));
-        EX.assert(EX.true.hasType(EX.Value));
-        EX.assert(EX.true.hasType(EX.Boolean));
-        EX.deny(EX.true.hasType(EX.Void));
-        EX.deny(EX.true.hasType(EX.Unit));
+        EX.assert(EX.true.inhabitsType(EX.Type));
+        EX.assert(EX.true.inhabitsType(EX.Value));
+        EX.assert(EX.true.inhabitsType(EX.Boolean));
+        EX.deny(EX.true.inhabitsType(EX.Void));
+        EX.assert(EX.true.inhabitsType(EX.Unit));
 
         EX.assert(EX.true.equals(EX.true));
         EX.deny(EX.true.equals(type));
@@ -316,11 +305,11 @@ EX.selfTest = (function ()
         EX.deny(EX.true.equals(EX.null));
         EX.deny(EX.true.equals(EX.false));
 
-        EX.assert(EX.false.hasType(EX.Type));
-        EX.assert(EX.false.hasType(EX.Value));
-        EX.assert(EX.false.hasType(EX.Boolean));
-        EX.deny(EX.false.hasType(EX.Void));
-        EX.deny(EX.false.hasType(EX.Unit));
+        EX.assert(EX.false.inhabitsType(EX.Type));
+        EX.assert(EX.false.inhabitsType(EX.Value));
+        EX.assert(EX.false.inhabitsType(EX.Boolean));
+        EX.deny(EX.false.inhabitsType(EX.Void));
+        EX.assert(EX.false.inhabitsType(EX.Unit));
 
         EX.assert(EX.false.equals(EX.false));
         EX.deny(EX.false.equals(type));
