@@ -208,7 +208,6 @@ EX.selfTest = (function ()
         EX.assert(type.equals(type));
         // TODO: requires "not" operator (i.e. need boolean logic)
         // EX.assert(type.equals(value).not());
-        // EX.assert(type.equals(EX.void).not());
         // EX.assert(type.equals(EX.null).not());
         // EX.assert(type.equals(EX.true).not());
         // EX.assert(type.equals(EX.false).not());
@@ -238,7 +237,6 @@ EX.selfTest = (function ()
         EX.assert(value.equals(value));
         // TODO: requires "not" operator (i.e. need boolean logic)
         // EX.assert(value.equals(type).not());
-        // EX.assert(value.equals(EX.void).not());
         // EX.assert(value.equals(EX.null).not());
         // EX.assert(value.equals(EX.true).not());
         // EX.assert(value.equals(EX.false).not());
@@ -284,7 +282,6 @@ EX.selfTest = (function ()
         // TODO: requires "not" operator (i.e. need boolean logic)
         // EX.assert(EX.null.equals(type).not());
         // EX.assert(EX.null.equals(value).not());
-        // EX.assert(EX.null.equals(EX.void).not());
         // EX.assert(EX.null.equals(EX.true).not());
         // EX.assert(EX.null.equals(EX.false).not());
 
@@ -314,7 +311,6 @@ EX.selfTest = (function ()
         // TODO: requires "not" operator (i.e. need boolean logic)
         // EX.assert(EX.true.equals(type).not());
         // EX.assert(EX.true.equals(value).not());
-        // EX.assert(EX.true.equals(EX.void).not());
         // EX.assert(EX.true.equals(EX.null).not());
         // EX.assert(EX.true.equals(EX.false).not());
 
@@ -329,7 +325,6 @@ EX.selfTest = (function ()
         // TODO: requires "not" operator (i.e. need boolean logic)
         // EX.assert(EX.false.equals(type).not());
         // EX.assert(EX.false.equals(value).not());
-        // EX.assert(EX.false.equals(EX.void).not());
         // EX.assert(EX.false.equals(EX.null).not());
         // EX.assert(EX.false.equals(EX.true).not());
     }
