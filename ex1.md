@@ -8,6 +8,8 @@ Is `Not Introduction 3` rule valid to include? I am uncertain of the full conseq
 
 Is the soundness demonstration of `Not Introduction 3` rule valid? In particular, can `Not Elimination 1 (or 2)` be applied to `not(not(e))` syntax?
 
+Furthermore, even `Not Introduction 1 (and 2)` imply the law of exluded middle, which implies Classical Logic. Since we're after Constructive Logic, probably need to formulate this quite differently.
+
 ## Syntax Chart
 
 | Sort   | Abstract Syntax | Concrete Syntax | Meaning
