@@ -118,19 +118,10 @@ EX.Void = EX.Type(Object.assign({},
         distinguished: ordinal(),
         constructor: function Void()
         {
-            if (!(this instanceof Void))
-            {
-                return new Void();
-            }
-            if (EX.void === undefined)
-            {
-                EX.void = deepFreeze(this);
-            }
-            return EX.void;
+            throw new Error("Void type has no instances");
         }
     }
 ));
-EX.void = EX.Void();
 
 EX.Unit = EX.Type(Object.assign({},
     EX.Type.prototype,
@@ -142,16 +133,16 @@ EX.Unit = EX.Type(Object.assign({},
             {
                 return new Unit();
             }
-            if (EX.unit === undefined)
+            if (EX.null === undefined)
             {
                 this._value = null;
-                EX.unit = deepFreeze(this);
+                EX.null = deepFreeze(this);
             }
-            return EX.unit;
+            return EX.null;
         }
     }
 ));
-EX.unit = EX.Unit();
+EX.null = EX.Unit();
 
 EX.Boolean = EX.Type(Object.assign({},
     EX.Type.prototype,
@@ -218,7 +209,7 @@ EX.selfTest = (function ()
         // TODO: requires "not" operator (i.e. need boolean logic)
         // EX.assert(type.equals(value).not());
         // EX.assert(type.equals(EX.void).not());
-        // EX.assert(type.equals(EX.unit).not());
+        // EX.assert(type.equals(EX.null).not());
         // EX.assert(type.equals(EX.true).not());
         // EX.assert(type.equals(EX.false).not());
 
@@ -248,7 +239,7 @@ EX.selfTest = (function ()
         // TODO: requires "not" operator (i.e. need boolean logic)
         // EX.assert(value.equals(type).not());
         // EX.assert(value.equals(EX.void).not());
-        // EX.assert(value.equals(EX.unit).not());
+        // EX.assert(value.equals(EX.null).not());
         // EX.assert(value.equals(EX.true).not());
         // EX.assert(value.equals(EX.false).not());
 
@@ -267,21 +258,6 @@ EX.selfTest = (function ()
         // EX.assert(EX.Void.equals(EX.Unit).not());
         // EX.assert(EX.Void.equals(EX.Boolean).not());
 
-        EX.assert(EX.void.hasType(EX.Type));
-        EX.assert(EX.void.hasType(EX.Value));
-        EX.assert(EX.void.hasType(EX.Void));
-        // TODO: requires "not" operator (i.e. need boolean logic)
-        // EX.assert(EX.void.hasType(EX.Unit).not());
-        // EX.assert(EX.void.hasType(EX.Boolean).not());
-
-        EX.assert(EX.void.equals(EX.void));
-        // TODO: requires "not" operator (i.e. need boolean logic)
-        // EX.assert(EX.void.equals(type).not());
-        // EX.assert(EX.void.equals(value).not());
-        // EX.assert(EX.void.equals(EX.unit).not());
-        // EX.assert(EX.void.equals(EX.true).not());
-        // EX.assert(EX.void.equals(EX.false).not());
-
         // Unit
         EX.assert(EX.Unit.hasType(EX.Type));
         EX.assert(EX.Unit.hasType(EX.Value));
@@ -297,20 +273,20 @@ EX.selfTest = (function ()
         // EX.assert(EX.Unit.equals(EX.Void).not());
         // EX.assert(EX.Unit.equals(EX.Boolean).not());
 
-        EX.assert(EX.unit.hasType(EX.Type));
-        EX.assert(EX.unit.hasType(EX.Value));
-        EX.assert(EX.unit.hasType(EX.Unit));
+        EX.assert(EX.null.hasType(EX.Type));
+        EX.assert(EX.null.hasType(EX.Value));
+        EX.assert(EX.null.hasType(EX.Unit));
         // TODO: requires "not" operator (i.e. need boolean logic)
-        // EX.assert(EX.unit.hasType(EX.Void).not());
-        // EX.assert(EX.unit.hasType(EX.Boolean).not());
+        // EX.assert(EX.null.hasType(EX.Void).not());
+        // EX.assert(EX.null.hasType(EX.Boolean).not());
 
-        EX.assert(EX.unit.equals(EX.unit));
+        EX.assert(EX.null.equals(EX.null));
         // TODO: requires "not" operator (i.e. need boolean logic)
-        // EX.assert(EX.unit.equals(type).not());
-        // EX.assert(EX.unit.equals(value).not());
-        // EX.assert(EX.unit.equals(EX.void).not());
-        // EX.assert(EX.unit.equals(EX.true).not());
-        // EX.assert(EX.unit.equals(EX.false).not());
+        // EX.assert(EX.null.equals(type).not());
+        // EX.assert(EX.null.equals(value).not());
+        // EX.assert(EX.null.equals(EX.void).not());
+        // EX.assert(EX.null.equals(EX.true).not());
+        // EX.assert(EX.null.equals(EX.false).not());
 
         // Boolean
         EX.assert(EX.Boolean.hasType(EX.Type));
@@ -339,7 +315,7 @@ EX.selfTest = (function ()
         // EX.assert(EX.true.equals(type).not());
         // EX.assert(EX.true.equals(value).not());
         // EX.assert(EX.true.equals(EX.void).not());
-        // EX.assert(EX.true.equals(EX.unit).not());
+        // EX.assert(EX.true.equals(EX.null).not());
         // EX.assert(EX.true.equals(EX.false).not());
 
         EX.assert(EX.false.hasType(EX.Type));
@@ -354,7 +330,7 @@ EX.selfTest = (function ()
         // EX.assert(EX.false.equals(type).not());
         // EX.assert(EX.false.equals(value).not());
         // EX.assert(EX.false.equals(EX.void).not());
-        // EX.assert(EX.false.equals(EX.unit).not());
+        // EX.assert(EX.false.equals(EX.null).not());
         // EX.assert(EX.false.equals(EX.true).not());
     }
 })();
