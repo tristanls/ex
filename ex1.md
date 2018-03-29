@@ -2,6 +2,12 @@
 
 Provides a `not` operator for Boolean type.
 
+## Open Questions
+
+Is `Not Introduction 3` rule valid to include? I am uncertain of the full consequences of introducing it.
+
+Is the soundness demonstration of `Not Introduction 3` rule valid? In particular, can `Not Elimination 1 (or 2)` be applied to `not(not(e))` syntax?
+
 ## Syntax Chart
 
 | Sort   | Abstract Syntax | Concrete Syntax | Meaning
