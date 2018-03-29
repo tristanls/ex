@@ -13,10 +13,15 @@ Provides a `not` operator for Boolean type.
 
 ## Statics
 
+### True
+
 ```
 ---------------
 Γ ⊢ true : bool
 ```
+
+### False
+
 ```
 ----------------
 Γ ⊢ false : bool
@@ -79,9 +84,9 @@ Provides a `not` operator for Boolean type.
      Γ ⊢ false : bool
 -------------------------- Not Introduction 3
 Γ ⊢ not(not(false)) : bool
-------------------------- Not Elimination 2
+-------------------------- Not Elimination 2
   Γ ⊢ not(true) : bool
-------------------------- Not Elimination 1
+-------------------------- Not Elimination 1
      Γ ⊢ false : bool
 ```
 
