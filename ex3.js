@@ -78,6 +78,7 @@ EX["⊥"] = EX.falsity;
 console.log(EX.truth);
 console.log(EX.falsity);
 console.log(EX.truth.equals(EX.falsity));
+console.log(EX.truth.equals(EX.truth));
 
 EX.Conjunction = ex.Type(Object.assign({},
     EX.IsProposition.prototype,

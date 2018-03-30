@@ -49,6 +49,23 @@ const valuePrototype =
         {
             return EX.true;
         }
+        if (that.inhabits(this.constructor) === EX.false)
+        {
+            return EX.false;
+        }
+        if (this._value
+            && that._value
+            && Object.keys(this._value).length === Object.keys(that._value).length)
+        {
+            for (let entry of Object.entries(this._value))
+            {
+                if (entry[1].equals(that._value[entry[0]]) === EX.false)
+                {
+                    return EX.false;
+                }
+            }
+            return EX.true;
+        }
         return EX.false;
     }
 };

@@ -16,29 +16,6 @@ EX.Conjoiner = ex.Type(Object.assign({},
             ex.assert(ex.Boolean(Array.isArray(value)));
             this._value = value;
         },
-        equals(that)
-        {
-            if (this === that)
-            {
-                return ex.true;
-            }
-            if (that.inhabits(EX.Conjoiner) === ex.false)
-            {
-                return ex.false;
-            }
-            if (this._value.length === that._value.length)
-            {
-                for (let i = 0; i < that._value.length; i++)
-                {
-                    if (this._value[i].equals(that._value[i]) === ex.false)
-                    {
-                        return ex.false;
-                    }
-                }
-                return ex.true;
-            }
-            return ex.false;
-        },
         join(value)
         {
             ex.assert(value.inhabits(ex.Value));
@@ -64,25 +41,6 @@ EX.Judgment = ex.Type(Object.assign({},
                 form,
                 subjects
             };
-        },
-        equals(that)
-        {
-            if (this === that)
-            {
-                return ex.true;
-            }
-            if (that.inhabits(EX.Judgment) === ex.false)
-            {
-                return ex.false;
-            }
-            for (let entry of Object.entries(this._value))
-            {
-                if (entry[1].equals(that._value[entry[0]]) === ex.false)
-                {
-                    return ex.false;
-                }
-            }
-            return ex.true;
         },
         // TODO: get rid of accessors once there are distinguishable things
         //       to "do" with judgments
@@ -116,25 +74,6 @@ EX.HypotheticalJudgment = ex.Type(Object.assign({},
                 form: this,
                 subjects: hypotheses.join(conclusion)
             };
-        },
-        equals(that)
-        {
-            if (this === that)
-            {
-                return ex.true;
-            }
-            if (that.inhabits(EX.HypotheticalJudgment) === ex.false)
-            {
-                return ex.false;
-            }
-            for (let entry of Object.entries(this._value))
-            {
-                if (entry[1].equals(that._value[entry[0]]) === ex.false)
-                {
-                    return ex.false;
-                }
-            }
-            return ex.true;
         }
     }
 ));
@@ -157,25 +96,6 @@ EX.Rule = ex.Type(Object.assign({},
                 premises
             };
         },
-        equals(that)
-        {
-            if (this === that)
-            {
-                return ex.true;
-            }
-            if (that.inhabits(EX.Rule) === ex.false)
-            {
-                return ex.false;
-            }
-            for (let entry of Object.entries(this._value))
-            {
-                if (entry[1].equals(that._value[entry[0]]) === ex.false)
-                {
-                    return ex.false;
-                }
-            }
-            return ex.true;
-        },
         // TODO: get rid of accessors once there are distinguishable things
         //       to "do" with rules
         conclusion()
@@ -188,3 +108,64 @@ EX.Rule = ex.Type(Object.assign({},
         }
     }
 ));
+
+EX.selfTest = (function ()
+{
+    const conjoiner = EX.Conjoiner([]);
+    return function selfTest()
+    {
+        // Conjoiner
+        ex.assert(EX.Conjoiner.inhabits(ex.Type));
+        ex.assert(EX.Conjoiner.inhabits(ex.Value));
+        ex.deny(EX.Conjoiner.inhabits(EX.Conjoiner));
+        ex.deny(EX.Conjoiner.inhabits(EX.Judgment));
+        ex.deny(EX.Conjoiner.inhabits(EX.HypotheticalJudgment));
+        ex.deny(EX.Conjoiner.inhabits(EX.Rule));
+
+        ex.assert(EX.Conjoiner.equals(EX.Conjoiner));
+        ex.deny(EX.Conjoiner.equals(EX.Judgment));
+        ex.deny(EX.Conjoiner.equals(EX.HypotheticalJudgment));
+        ex.deny(EX.Conjoiner.equals(EX.Rule));
+
+        // Judgment
+        ex.assert(EX.Judgment.inhabits(ex.Type));
+        ex.assert(EX.Judgment.inhabits(ex.Value));
+        ex.deny(EX.Judgment.inhabits(EX.Conjoiner));
+        ex.deny(EX.Judgment.inhabits(EX.Judgment));
+        ex.deny(EX.Judgment.inhabits(EX.HypotheticalJudgment));
+        ex.deny(EX.Judgment.inhabits(EX.Rule));
+
+        ex.deny(EX.Judgment.equals(EX.Conjoiner));
+        ex.assert(EX.Judgment.equals(EX.Judgment));
+        ex.deny(EX.Judgment.equals(EX.HypotheticalJudgment));
+        ex.deny(EX.Judgment.equals(EX.Rule));
+
+        // HypotheticalJudgment
+        ex.assert(EX.HypotheticalJudgment.inhabits(ex.Type));
+        ex.assert(EX.HypotheticalJudgment.inhabits(ex.Value));
+        ex.deny(EX.HypotheticalJudgment.inhabits(EX.Conjoiner));
+        ex.deny(EX.HypotheticalJudgment.inhabits(EX.Judgment));
+        ex.deny(EX.HypotheticalJudgment.inhabits(EX.HypotheticalJudgment));
+        ex.deny(EX.HypotheticalJudgment.inhabits(EX.Rule));
+
+        ex.deny(EX.HypotheticalJudgment.equals(EX.Conjoiner));
+        ex.deny(EX.HypotheticalJudgment.equals(EX.Judgment));
+        ex.assert(EX.HypotheticalJudgment.equals(EX.HypotheticalJudgment));
+        ex.deny(EX.HypotheticalJudgment.equals(EX.Rule));
+
+        // Rule
+        ex.assert(EX.Rule.inhabits(ex.Type));
+        ex.assert(EX.Rule.inhabits(ex.Value));
+        ex.deny(EX.Rule.inhabits(EX.Conjoiner));
+        ex.deny(EX.Rule.inhabits(EX.Judgment));
+        ex.deny(EX.Rule.inhabits(EX.HypotheticalJudgment));
+        ex.deny(EX.Rule.inhabits(EX.Rule));
+
+        ex.deny(EX.Rule.equals(EX.Conjoiner));
+        ex.deny(EX.Rule.equals(EX.Judgment));
+        ex.deny(EX.Rule.equals(EX.HypotheticalJudgment));
+        ex.assert(EX.Rule.equals(EX.Rule));
+    }
+})();
+
+ex.deepFreeze(EX);
