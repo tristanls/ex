@@ -144,11 +144,11 @@ EX["⟹"] = EX.Implication;
 ```
 */
 const truthIntroduction = ex2.Rule(
+    ex2.Conjoiner([]),
     ex2.HypotheticalJudgment(
-        EX.IsTrue(EX.truth),
-        ex2.Conjoiner([]) // no Γ implementation yet
-    ),
-    ex2.Conjoiner([])
+        ex2.Conjoiner([]), // no Γ implementation yet
+        EX.IsTrue(EX.truth)
+    )
 );
 console.log(truthIntroduction);
 console.log(truthIntroduction.equals(truthIntroduction));
@@ -164,21 +164,21 @@ console.log(truthIntroduction.equals(ex.true));
 const prop1 = EX.IsProposition(ex.Type());
 const prop2 = EX.IsProposition(ex.Type());
 const conjunctionIntroduction = ex2.Rule(
-    ex2.HypotheticalJudgment(
-        EX.IsTrue(EX["⋀"](prop1, prop2)),
-        ex2.Conjoiner([]) // no Γ implementation yet
-    ),
     ex2.Conjoiner(
         [
             ex2.HypotheticalJudgment(
-                EX.IsTrue(prop1),
-                ex2.Conjoiner([]) // no Γ implementation yet
+                ex2.Conjoiner([]), // no Γ implementation yet
+                EX.IsTrue(prop1)
             ),
             ex2.HypotheticalJudgment(
-                EX.IsTrue(prop2),
-                ex2.Conjoiner([]) // no Γ implementation yet
+                ex2.Conjoiner([]), // no Γ implementation yet
+                EX.IsTrue(prop2)
             )
         ]
+    ),
+    ex2.HypotheticalJudgment(
+        ex2.Conjoiner([]), // no Γ implementation yet
+        EX.IsTrue(EX["⋀"](prop1, prop2))
     )
 );
 console.log(conjunctionIntroduction);

@@ -58,22 +58,21 @@ EX.Judgment = ex.Type(Object.assign({},
 EX.HypotheticalJudgment = ex.Type(Object.assign({},
     EX.Judgment.prototype,
     {
-        constructor: function HypotheticalJudgment(conclusion, hypotheses)
+        constructor: function HypotheticalJudgment(hypotheses, conclusion)
         {
             if (!(this instanceof HypotheticalJudgment))
             {
-                return new HypotheticalJudgment(conclusion, hypotheses);
+                return new HypotheticalJudgment(hypotheses, conclusion);
             }
-            ex.assert(conclusion.inhabits(EX.Judgment));
             ex.assert(hypotheses.inhabits(EX.Conjoiner));
             hypotheses._value.map(hypothesis => ex.assert(hypothesis.inhabits(EX.Judgment)));
+            ex.assert(conclusion.inhabits(EX.Judgment));
             this._value =
             {
                 conclusion,
-                hypotheses,
-                form: this,
-                subjects: hypotheses.join(conclusion)
+                hypotheses
             };
+            return EX.Judgment(this, hypotheses.join(conclusion));
         }
     }
 ));
@@ -81,15 +80,15 @@ EX.HypotheticalJudgment = ex.Type(Object.assign({},
 EX.Rule = ex.Type(Object.assign({},
     ex.Type.prototype,
     {
-        constructor: function Rule(conclusion, premises)
+        constructor: function Rule(premises, conclusion)
         {
             if (!(this instanceof Rule))
             {
-                return new Rule(conclusion, premises);
+                return new Rule(premises, conclusion);
             }
-            ex.assert(conclusion.inhabits(EX.Judgment));
             ex.assert(premises.inhabits(EX.Conjoiner));
             premises._value.map(premise => ex.assert(premise.inhabits(EX.Judgment)));
+            ex.assert(conclusion.inhabits(EX.Judgment));
             this._value =
             {
                 conclusion,
@@ -213,6 +212,45 @@ EX.selfTest = (function ()
         const judgment2 = EX.Judgment(ex.Value(), EX.Conjoiner([]));
         ex.deny(judgment.equals(judgment2));
         ex.assert(judgment.equals(judgment));
+
+        // HypotheticalJudgment instance
+
+        //   inhabits only Type, Value, and all Judgment types
+        const hypotheticalJudgment = EX.HypotheticalJudgment(
+            EX.Conjoiner([]),
+            EX.Judgment(ex.Value(), EX.Conjoiner([]))
+        );
+        types.filter(type =>
+                [
+                    ex.Type, ex.Value, EX.Judgment, EX.HypotheticalJudgment,
+                    EX.IsProposition, EX.IsTrue
+                ]
+                .includes(type)
+            )
+            .map(type => ex.assert(hypotheticalJudgment.inhabits(type), type.name));
+        types.filter(type =>
+                ![
+                    ex.Type, ex.Value, EX.Judgment, EX.HypotheticalJudgment,
+                    EX.IsProposition, EX.IsTrue
+                ]
+                .includes(type)
+            )
+            .map(type => ex.deny(hypotheticalJudgment.inhabits(type), type.name));
+
+        // does not equal any type
+        types.map(type => ex.deny(hypotheticalJudgment.equals(type), type.name));
+
+        const sameJudgment = EX.Judgment(ex.Value(), EX.Conjoiner([]));
+        const hypotheticalJudgment2 = EX.HypotheticalJudgment(
+            EX.Conjoiner([]),
+            sameJudgment
+        );
+        ex.deny(hypotheticalJudgment.equals(hypotheticalJudgment2));
+        const hypotheticalJudgment3 = EX.HypotheticalJudgment(
+            EX.Conjoiner([]),
+            sameJudgment
+        );
+        ex.assert(hypotheticalJudgment2.equals(hypotheticalJudgment3));
 
         return true;
     }
