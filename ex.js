@@ -436,6 +436,38 @@ EX.selfTest = (function ()
         EX.deny(_false.equals(EX.null));
         EX.deny(_false.equals(_true));
 
+        // Option from Sum
+        const Option = EX.Sum([EX.Value, EX.Unit]);
+        EX.assert(Option.inhabits(EX.Type));
+        EX.assert(Option.inhabits(EX.Value));
+        EX.assert(Option.inhabits(EX.Sum));
+        EX.deny(Option.inhabits(EX.Void));
+        EX.assert(Option.inhabits(EX.Unit));
+
+        EX.assert(Option.equals(EX.Sum([EX.Value, EX.Unit])));
+
+        const hasValue = Option(1, EX.Value());
+        EX.assert(hasValue.inhabits(EX.Type));
+        EX.assert(hasValue.inhabits(EX.Value));
+        EX.deny(hasValue.inhabits(EX.Void));
+        EX.assert(hasValue.inhabits(EX.Unit));
+        EX.assert(hasValue.inhabits(EX.Sum([EX.Value, EX.Unit])));
+        EX.assert(hasValue.inhabits(Option));
+
+        const noValue = Option(2, EX.null);
+        EX.assert(noValue.inhabits(EX.Type));
+        EX.assert(noValue.inhabits(EX.Value));
+        EX.deny(noValue.inhabits(EX.Void));
+        EX.assert(noValue.inhabits(EX.Unit));
+        EX.assert(noValue.inhabits(EX.Sum([EX.Value, EX.Unit])));
+        EX.assert(noValue.inhabits(Option));
+
+        EX.assert(hasValue.equals(hasValue));
+        EX.assert(noValue.equals(noValue));
+        EX.deny(hasValue.equals(noValue));
+        EX.deny(noValue.equals(hasValue));
+        EX.deny(hasValue.equals(Option(1, EX.Value())));
+
         // Boolean
         EX.assert(EX.Boolean.inhabits(EX.Type));
         EX.assert(EX.Boolean.inhabits(EX.Value));
