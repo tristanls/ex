@@ -252,6 +252,34 @@ EX.selfTest = (function ()
         );
         ex.assert(hypotheticalJudgment2.equals(hypotheticalJudgment3));
 
+        // Rule instance
+
+        //   inhabits only Type, Value, and Rule
+        const rule = EX.Rule(
+            EX.Conjoiner([]),
+            EX.Judgment(ex.Value(), EX.Conjoiner([]))
+        );
+        types.filter(type => [ ex.Type, ex.Value, EX.Rule ].includes(type))
+            .map(type => ex.assert(rule.inhabits(type), type.name));
+        types.filter(type => ![ ex.Type, ex.Value, EX.Rule ].includes(type))
+            .map(type => ex.deny(rule.inhabits(type), type.name));
+
+        //   does not equal any type
+        types.map(type => ex.deny(rule.equals(type), type.name));
+
+        const sameJudgment2 = EX.Judgment(ex.Value(), EX.Conjoiner([]));
+        const rule2 = EX.Rule(
+            EX.Conjoiner([]),
+            sameJudgment2
+        );
+        ex.deny(rule.equals(rule2));
+        ex.assert(rule.equals(rule));
+        const rule3 = EX.Rule(
+            EX.Conjoiner([]),
+            sameJudgment2
+        );
+        ex.assert(rule2.equals(rule3));
+
         return true;
     }
 })();
