@@ -109,62 +109,63 @@ EX.Rule = ex.Type(Object.assign({},
     }
 ));
 
+EX.IsProposition = ex.Type(Object.assign({},
+    EX.Judgment.prototype,
+    {
+        constructor: function IsProposition(subject)
+        {
+            if (!(this instanceof IsProposition))
+            {
+                return new IsProposition(subject);
+            }
+            ex.assert(subject.inhabits(ex.Value));
+            return EX.Judgment(this, EX.Conjoiner([subject]));
+        }
+    }
+));
+
+EX.IsTrue = ex.Type(Object.assign({},
+    EX.Judgment.prototype,
+    {
+        constructor: function IsTrue(subject)
+        {
+            if (!(this instanceof IsTrue))
+            {
+                return new IsTrue(subject);
+            }
+            ex.assert(subject.inhabits(ex.Value));
+            return EX.Judgment(this, EX.Conjoiner([subject]));
+        }
+    }
+));
+
 EX.selfTest = (function ()
 {
-    const conjoiner = EX.Conjoiner([]);
+    const newTypes =
+    [
+        EX.Conjoiner, EX.Judgment, EX.HypotheticalJudgment, EX.Rule,
+        EX.IsProposition, EX.IsTrue
+    ];
+    const types =
+    [
+        ex.Type, ex.Value,
+    ]
+    .concat(newTypes);
+
     return function selfTest()
     {
-        // Conjoiner
-        ex.assert(EX.Conjoiner.inhabits(ex.Type));
-        ex.assert(EX.Conjoiner.inhabits(ex.Value));
-        ex.deny(EX.Conjoiner.inhabits(EX.Conjoiner));
-        ex.deny(EX.Conjoiner.inhabits(EX.Judgment));
-        ex.deny(EX.Conjoiner.inhabits(EX.HypotheticalJudgment));
-        ex.deny(EX.Conjoiner.inhabits(EX.Rule));
+        newTypes.map(testType =>
+            {
+                types.filter(type => [ ex.Type, ex.Value ].includes(type))
+                    .map(type => ex.assert(testType.inhabits(type)));
+                types.filter(type => ![ ex.Type, ex.Value ].includes(type))
+                    .map(type => ex.deny(testType.inhabits(type)));
 
-        ex.assert(EX.Conjoiner.equals(EX.Conjoiner));
-        ex.deny(EX.Conjoiner.equals(EX.Judgment));
-        ex.deny(EX.Conjoiner.equals(EX.HypotheticalJudgment));
-        ex.deny(EX.Conjoiner.equals(EX.Rule));
-
-        // Judgment
-        ex.assert(EX.Judgment.inhabits(ex.Type));
-        ex.assert(EX.Judgment.inhabits(ex.Value));
-        ex.deny(EX.Judgment.inhabits(EX.Conjoiner));
-        ex.deny(EX.Judgment.inhabits(EX.Judgment));
-        ex.deny(EX.Judgment.inhabits(EX.HypotheticalJudgment));
-        ex.deny(EX.Judgment.inhabits(EX.Rule));
-
-        ex.deny(EX.Judgment.equals(EX.Conjoiner));
-        ex.assert(EX.Judgment.equals(EX.Judgment));
-        ex.deny(EX.Judgment.equals(EX.HypotheticalJudgment));
-        ex.deny(EX.Judgment.equals(EX.Rule));
-
-        // HypotheticalJudgment
-        ex.assert(EX.HypotheticalJudgment.inhabits(ex.Type));
-        ex.assert(EX.HypotheticalJudgment.inhabits(ex.Value));
-        ex.deny(EX.HypotheticalJudgment.inhabits(EX.Conjoiner));
-        ex.deny(EX.HypotheticalJudgment.inhabits(EX.Judgment));
-        ex.deny(EX.HypotheticalJudgment.inhabits(EX.HypotheticalJudgment));
-        ex.deny(EX.HypotheticalJudgment.inhabits(EX.Rule));
-
-        ex.deny(EX.HypotheticalJudgment.equals(EX.Conjoiner));
-        ex.deny(EX.HypotheticalJudgment.equals(EX.Judgment));
-        ex.assert(EX.HypotheticalJudgment.equals(EX.HypotheticalJudgment));
-        ex.deny(EX.HypotheticalJudgment.equals(EX.Rule));
-
-        // Rule
-        ex.assert(EX.Rule.inhabits(ex.Type));
-        ex.assert(EX.Rule.inhabits(ex.Value));
-        ex.deny(EX.Rule.inhabits(EX.Conjoiner));
-        ex.deny(EX.Rule.inhabits(EX.Judgment));
-        ex.deny(EX.Rule.inhabits(EX.HypotheticalJudgment));
-        ex.deny(EX.Rule.inhabits(EX.Rule));
-
-        ex.deny(EX.Rule.equals(EX.Conjoiner));
-        ex.deny(EX.Rule.equals(EX.Judgment));
-        ex.deny(EX.Rule.equals(EX.HypotheticalJudgment));
-        ex.assert(EX.Rule.equals(EX.Rule));
+                ex.assert(testType.equals(testType));
+                types.filter(type => type !== testType)
+                    .map(type => ex.deny(testType.equals(type)));
+            }
+        );
 
         return true;
     }
