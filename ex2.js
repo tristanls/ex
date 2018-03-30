@@ -156,16 +156,63 @@ EX.selfTest = (function ()
     {
         newTypes.map(testType =>
             {
+                // Every type inhabits only Type and Value
                 types.filter(type => [ ex.Type, ex.Value ].includes(type))
-                    .map(type => ex.assert(testType.inhabits(type)));
+                    .map(type => ex.assert(testType.inhabits(type), type.name));
                 types.filter(type => ![ ex.Type, ex.Value ].includes(type))
-                    .map(type => ex.deny(testType.inhabits(type)));
+                    .map(type => ex.deny(testType.inhabits(type), type.name));
 
+                // Every type is only equal to itself
                 ex.assert(testType.equals(testType));
                 types.filter(type => type !== testType)
-                    .map(type => ex.deny(testType.equals(type)));
+                    .map(type => ex.deny(testType.equals(type), type.name));
             }
         );
+
+        // Conjoiner instance
+
+        //   inhabits only Type, Value, and Conjoiner
+        const conjoiner = EX.Conjoiner([]);
+        types.filter(type => [ ex.Type, ex.Value, EX.Conjoiner ].includes(type))
+            .map(type => ex.assert(conjoiner.inhabits(type), type.name));
+        types.filter(type => ![ ex.Type, ex.Value, EX.Conjoiner ].includes(type))
+            .map(type => ex.deny(conjoiner.inhabits(type), type.name));
+
+        //   does not equal any type
+        types.map(type => ex.deny(conjoiner.equals(type)));
+
+        const conjoiner2 = EX.Conjoiner([ ex.Value(), ex.Value() ]);
+        ex.deny(conjoiner.equals(conjoiner2));
+        ex.assert(conjoiner.equals(conjoiner));
+        ex.assert(conjoiner2.equals(conjoiner2));
+
+        // Judgment instance
+
+        //   inhabits only Type, Value, and all Judgment types
+        const judgment = EX.Judgment(ex.Value(), EX.Conjoiner([]));
+        types.filter(type =>
+                [
+                    ex.Type, ex.Value, EX.Judgment, EX.HypotheticalJudgment,
+                    EX.IsProposition, EX.IsTrue
+                ]
+                .includes(type)
+            )
+            .map(type => ex.assert(judgment.inhabits(type), type.name));
+        types.filter(type =>
+                ![
+                    ex.Type, ex.Value, EX.Judgment, EX.HypotheticalJudgment,
+                    EX.IsProposition, EX.IsTrue
+                ]
+                .includes(type)
+            )
+            .map(type => ex.deny(judgment.inhabits(type), type.name));
+
+        //   does not equal any type
+        types.map(type => ex.deny(judgment.equals(type), type.name));
+
+        const judgment2 = EX.Judgment(ex.Value(), EX.Conjoiner([]));
+        ex.deny(judgment.equals(judgment2));
+        ex.assert(judgment.equals(judgment));
 
         return true;
     }
