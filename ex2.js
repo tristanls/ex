@@ -88,11 +88,11 @@ EX.Judgment = ex.Type(Object.assign({},
         //       to "do" with judgments
         form()
         {
-            return this._form;
+            return this._value.form;
         },
         subjects()
         {
-            return this._subjects;
+            return this._value.subjects;
         }
     }
 ));
@@ -151,8 +151,11 @@ EX.Rule = ex.Type(Object.assign({},
             ex.assert(conclusion.inhabits(EX.Judgment));
             ex.assert(premises.inhabits(EX.Conjoiner));
             premises._value.map(premise => ex.assert(premise.inhabits(EX.Judgment)));
-            this._conclusion = conclusion;
-            this._premises = premises;
+            this._value =
+            {
+                conclusion,
+                premises
+            };
         },
         equals(that)
         {
@@ -177,11 +180,11 @@ EX.Rule = ex.Type(Object.assign({},
         //       to "do" with rules
         conclusion()
         {
-            return this._conclusion;
+            return this._value.conclusion;
         },
         premises()
         {
-            return this._premises;
+            return this._value.premises;
         }
     }
 ));
