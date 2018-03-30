@@ -197,6 +197,62 @@ EX.Unit = EX.Type(Object.assign({},
 ));
 EX.null = EX.Unit();
 
+EX.Sum = EX.Type(Object.assign({},
+    EX.Type.prototype,
+    {
+        constructor: function Sum(types)
+        {
+            if (!(this instanceof Sum))
+            {
+                return new Sum(types);
+            }
+            EX.assert(EX.Boolean(Array.isArray(types)));
+            EX.assert(EX.Boolean(types.length > 0));
+            types.map(type => EX.assert(type.inhabits(EX.Type)));
+            const maxOrdinal = types.length;
+            this._value =
+            {
+                types
+            };
+            const self = this;
+            const prototype =
+            {
+                constructor: function Injector(ordinal, ...args)
+                {
+                    if (!(this instanceof Injector))
+                    {
+                        return new Injector(ordinal, ...args);
+                    }
+                    ordinal = parseInt(ordinal);
+                    EX.assert(EX.Boolean(ordinal > 0 && ordinal <= maxOrdinal));
+                    this._value =
+                    {
+                        occupant: self._value.types[ordinal - 1](...args),
+                        ordinal:
+                        {
+                            // hack for equality until we have EX.Number
+                            equals: that => that === ordinal,
+                            _value: ordinal
+                        }
+                    }
+                }
+            };
+            types.map((type, i) =>
+                {
+                    // self[`ordinal${i + 1}${type.name}`] = function () {};
+                    prototype[`ordinal${i + 1}${type.name}`] = function () {};
+                }
+            );
+            const injector = EX.Type(Object.assign({},
+                EX.Type.prototype,
+                prototype
+            ));
+            injector._value = types;
+            return injector;
+        }
+    }
+));
+
 EX.Boolean = EX.Type(Object.assign({},
     EX.Type.prototype,
     {
@@ -334,6 +390,51 @@ EX.selfTest = (function ()
         EX.deny(EX.null.equals(value));
         EX.deny(EX.null.equals(EX.true));
         EX.deny(EX.null.equals(EX.false));
+
+        // Sum
+        EX.assert(EX.Sum.inhabits(EX.Type));
+        EX.assert(EX.Sum.inhabits(EX.Value));
+        EX.deny(EX.Sum.inhabits(EX.Void));
+        EX.assert(EX.Sum.inhabits(EX.Unit));
+
+        // Boolean from Sum
+        const Boolean = EX.Sum([EX.Unit, EX.Unit]);
+        EX.assert(Boolean.inhabits(EX.Type));
+        EX.assert(Boolean.inhabits(EX.Value));
+        EX.assert(Boolean.inhabits(EX.Sum));
+        EX.deny(Boolean.inhabits(EX.Void));
+        EX.assert(Boolean.inhabits(EX.Unit));
+
+        EX.assert(Boolean.equals(EX.Sum([EX.Unit, EX.Unit])));
+        EX.deny(Boolean.equals(EX.Sum([EX.Unit, EX.Value])));
+
+        const _true = Boolean(1, EX.Unit);
+        EX.assert(_true.inhabits(EX.Type));
+        EX.assert(_true.inhabits(EX.Value));
+        EX.deny(_true.inhabits(EX.Void));
+        EX.assert(_true.inhabits(EX.Unit));
+        EX.assert(_true.inhabits(EX.Sum([EX.Unit, EX.Unit])));
+        EX.assert(_true.inhabits(Boolean));
+
+        const _false = Boolean(2, EX.Unit);
+        EX.assert(_false.inhabits(EX.Type));
+        EX.assert(_false.inhabits(EX.Value));
+        EX.deny(_false.inhabits(EX.Void));
+        EX.assert(_false.inhabits(EX.Unit));
+        EX.assert(_false.inhabits(EX.Sum([EX.Unit, EX.Unit])));
+        EX.assert(_false.inhabits(Boolean));
+
+        EX.assert(_true.equals(_true));
+        EX.deny(_true.equals(type));
+        EX.deny(_true.equals(value));
+        EX.deny(_true.equals(EX.null));
+        EX.deny(_true.equals(_false));
+
+        EX.assert(_false.equals(_false));
+        EX.deny(_false.equals(type));
+        EX.deny(_false.equals(value));
+        EX.deny(_false.equals(EX.null));
+        EX.deny(_false.equals(_true));
 
         // Boolean
         EX.assert(EX.Boolean.inhabits(EX.Type));

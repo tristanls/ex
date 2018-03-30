@@ -5,6 +5,8 @@ const ex2 = require("./ex2.js");
 
 const EX = module.exports;
 
+// TODO: rewrite to use _value
+
 EX.Truth = ex.Type(Object.assign({},
     ex2.IsProposition.prototype,
     {
