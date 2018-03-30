@@ -210,11 +210,6 @@ EX.Sum = EX.Type(Object.assign({},
             EX.assert(EX.Boolean(types.length > 0));
             types.map(type => EX.assert(type.inhabits(EX.Type)));
             const maxOrdinal = types.length;
-            this._value =
-            {
-                types
-            };
-            const self = this;
             const prototype =
             {
                 constructor: function Injector(ordinal, ...args)
@@ -227,7 +222,7 @@ EX.Sum = EX.Type(Object.assign({},
                     EX.assert(EX.Boolean(ordinal > 0 && ordinal <= maxOrdinal));
                     this._value =
                     {
-                        occupant: self._value.types[ordinal - 1](...args),
+                        occupant: types[ordinal - 1](...args),
                         ordinal:
                         {
                             // hack for equality until we have EX.Number
@@ -237,12 +232,7 @@ EX.Sum = EX.Type(Object.assign({},
                     }
                 }
             };
-            types.map((type, i) =>
-                {
-                    // self[`ordinal${i + 1}${type.name}`] = function () {};
-                    prototype[`ordinal${i + 1}${type.name}`] = function () {};
-                }
-            );
+            types.map((type, i) => prototype[`ordinal${i + 1}${type.name}`] = function () {});
             const injector = EX.Type(Object.assign({},
                 EX.Type.prototype,
                 prototype
