@@ -398,7 +398,7 @@ EX.selfTest = (function ()
         EX.assert(Boolean.equals(EX.Sum([EX.Unit, EX.Unit])));
         EX.deny(Boolean.equals(EX.Sum([EX.Unit, EX.Value])));
 
-        const _true = Boolean(1, EX.Unit);
+        const _true = Boolean(1, EX.null);
         EX.assert(_true.inhabits(EX.Type));
         EX.assert(_true.inhabits(EX.Value));
         EX.deny(_true.inhabits(EX.Void));
@@ -406,7 +406,7 @@ EX.selfTest = (function ()
         EX.assert(_true.inhabits(EX.Sum([EX.Unit, EX.Unit])));
         EX.assert(_true.inhabits(Boolean));
 
-        const _false = Boolean(2, EX.Unit);
+        const _false = Boolean(2, EX.null);
         EX.assert(_false.inhabits(EX.Type));
         EX.assert(_false.inhabits(EX.Value));
         EX.deny(_false.inhabits(EX.Void));
