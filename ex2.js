@@ -186,6 +186,8 @@ EX.selfTest = (function ()
         ex.deny(conjoiner.equals(conjoiner2));
         ex.assert(conjoiner.equals(conjoiner));
         ex.assert(conjoiner2.equals(conjoiner2));
+        const conjoiner3 = EX.Conjoiner([ ex.Value(), ex.Value() ]);
+        ex.deny(conjoiner2.equals(conjoiner3));
 
         // Judgment instance
 
