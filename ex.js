@@ -226,7 +226,7 @@ EX.Sum = EX.Type(Object.assign({},
                         ordinal:
                         {
                             // hack for equality until we have EX.Number
-                            equals: that => that === ordinal,
+                            equals: that => that._value === ordinal,
                             _value: ordinal
                         }
                     }
