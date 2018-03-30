@@ -75,6 +75,10 @@ EX.Falsity = ex.Type(Object.assign({},
 EX.falsity = EX.Falsity();
 EX["⊥"] = EX.falsity;
 
+console.log(EX.truth);
+console.log(EX.falsity);
+console.log(EX.truth.equals(EX.falsity));
+
 EX.Conjunction = ex.Type(Object.assign({},
     EX.IsProposition.prototype,
     {
