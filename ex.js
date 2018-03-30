@@ -212,17 +212,18 @@ EX.Sum = EX.Type(Object.assign({},
             const maxOrdinal = types.length;
             const prototype =
             {
-                constructor: function Injector(ordinal, ...args)
+                constructor: function Injector(ordinal, value)
                 {
                     if (!(this instanceof Injector))
                     {
-                        return new Injector(ordinal, ...args);
+                        return new Injector(ordinal, value);
                     }
                     ordinal = parseInt(ordinal);
                     EX.assert(EX.Boolean(ordinal > 0 && ordinal <= maxOrdinal));
+                    EX.assert(value.inhabits(types[ordinal - 1]));
                     this._value =
                     {
-                        occupant: types[ordinal - 1](...args),
+                        occupant: value,
                         ordinal:
                         {
                             // hack for equality until we have EX.Number
@@ -386,6 +387,15 @@ EX.selfTest = (function ()
         EX.assert(EX.Sum.inhabits(EX.Value));
         EX.deny(EX.Sum.inhabits(EX.Void));
         EX.assert(EX.Sum.inhabits(EX.Unit));
+
+        const MyType = EX.Sum([EX.Unit, EX.Unit, EX.Unit]);
+        const MyType2 = EX.Sum([MyType, MyType]);
+        const myInst = MyType(3, EX.null);
+        EX.assert(myInst.inhabits(MyType));
+        EX.deny(myInst.inhabits(MyType2));
+        const myInst2 = MyType2(1, myInst);
+        EX.assert(myInst2.inhabits(MyType2));
+        EX.deny(myInst2.inhabits(MyType));
 
         // Boolean from Sum
         const Boolean = EX.Sum([EX.Unit, EX.Unit]);
