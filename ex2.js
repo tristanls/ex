@@ -11,11 +11,33 @@ EX.Conjoiner = ex.Type(Object.assign({},
         {
             if (!(this instanceof Conjoiner))
             {
-                return new Conjoiner();
+                return new Conjoiner(value);
             }
             ex.assert(ex.Boolean(Array.isArray(value)));
             this._value = value;
-            ex.deepFreeze(this);
+        },
+        equals(that)
+        {
+            if (this === that)
+            {
+                return ex.true;
+            }
+            if (that.inhabits(EX.Conjoiner) === ex.false)
+            {
+                return ex.false;
+            }
+            if (this._value.length === that._value.length)
+            {
+                for (let i = 0; i < that._value.length; i++)
+                {
+                    if (this._value[i].equals(that._value[i]) === ex.false)
+                    {
+                        return ex.false;
+                    }
+                }
+                return ex.true;
+            }
+            return ex.false;
         },
         join(value)
         {
@@ -37,9 +59,30 @@ EX.Judgment = ex.Type(Object.assign({},
             ex.assert(form.inhabits(ex.Type));
             ex.assert(subjects.inhabits(EX.Conjoiner));
             subjects._value.map(subject => ex.assert(subject.inhabits(ex.Type)));
-            this._form = form;
-            this._subjects = subjects;
-            this._value = this; // judgement value is itself
+            this._value =
+            {
+                form,
+                subjects
+            };
+        },
+        equals(that)
+        {
+            if (this === that)
+            {
+                return ex.true;
+            }
+            if (that.inhabits(EX.Judgment) === ex.false)
+            {
+                return ex.false;
+            }
+            for (let entry of Object.entries(this._value))
+            {
+                if (entry[1].equals(that._value[entry[0]]) === ex.false)
+                {
+                    return ex.false;
+                }
+            }
+            return ex.true;
         },
         // TODO: get rid of accessors once there are distinguishable things
         //       to "do" with judgments
@@ -50,6 +93,48 @@ EX.Judgment = ex.Type(Object.assign({},
         subjects()
         {
             return this._subjects;
+        }
+    }
+));
+
+EX.HypotheticalJudgment = ex.Type(Object.assign({},
+    EX.Judgment.prototype,
+    {
+        constructor: function HypotheticalJudgment(conclusion, hypotheses)
+        {
+            if (!(this instanceof HypotheticalJudgment))
+            {
+                return new HypotheticalJudgment(conclusion, hypotheses);
+            }
+            ex.assert(conclusion.inhabits(EX.Judgment));
+            ex.assert(hypotheses.inhabits(EX.Conjoiner));
+            hypotheses._value.map(hypothesis => ex.assert(hypothesis.inhabits(EX.Judgment)));
+            this._value =
+            {
+                conclusion,
+                hypotheses,
+                form: this,
+                subjects: hypotheses.join(conclusion)
+            };
+        },
+        equals(that)
+        {
+            if (this === that)
+            {
+                return ex.true;
+            }
+            if (that.inhabits(EX.HypotheticalJudgment) === ex.false)
+            {
+                return ex.false;
+            }
+            for (let entry of Object.entries(this._value))
+            {
+                if (entry[1].equals(that._value[entry[0]]) === ex.false)
+                {
+                    return ex.false;
+                }
+            }
+            return ex.true;
         }
     }
 ));
@@ -68,7 +153,25 @@ EX.Rule = ex.Type(Object.assign({},
             premises._value.map(premise => ex.assert(premise.inhabits(EX.Judgment)));
             this._conclusion = conclusion;
             this._premises = premises;
-            this._value = this; // rule value is itself
+        },
+        equals(that)
+        {
+            if (this === that)
+            {
+                return ex.true;
+            }
+            if (that.inhabits(EX.Rule) === ex.false)
+            {
+                return ex.false;
+            }
+            for (let entry of Object.entries(this._value))
+            {
+                if (entry[1].equals(that._value[entry[0]]) === ex.false)
+                {
+                    return ex.false;
+                }
+            }
+            return ex.true;
         },
         // TODO: get rid of accessors once there are distinguishable things
         //       to "do" with rules
