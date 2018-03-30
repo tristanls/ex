@@ -61,9 +61,9 @@ const valuePrototype =
             }
             if (!this._value || !that._value)
             {
-                // One of *._value is defined but falsy. If falsy value like 0
-                // or null does not triple equal the other value, then it is
-                // not equal.
+                // One of *._value is defined but falsy. If falsy value like 0,
+                // false, or null does not triple equal the other value, then it
+                // is not equal.
                 return EX.false;
             }
             if (this._value.equals !== undefined)
