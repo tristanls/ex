@@ -118,8 +118,7 @@ EX.IsProposition = ex.Type(Object.assign({},
                 return new IsProposition(subject);
             }
             ex.assert(subject.inhabits(ex.Value));
-            this._value = subject;
-            return EX.Judgment(this, EX.Conjoiner([subject]));
+            return EX.Judgment(EX.IsProposition, EX.Conjoiner([subject]));
         }
     }
 ));
@@ -134,8 +133,7 @@ EX.IsTrue = ex.Type(Object.assign({},
                 return new IsTrue(subject);
             }
             ex.assert(subject.inhabits(ex.Value));
-            this._value = subject;
-            return EX.Judgment(this, EX.Conjoiner([subject]));
+            return EX.Judgment(EX.IsTrue, EX.Conjoiner([subject]));
         }
     }
 ));
