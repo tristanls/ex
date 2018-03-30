@@ -345,6 +345,8 @@ EX.selfTest = (function ()
         EX.deny(EX.false.equals(value));
         EX.deny(EX.false.equals(EX.null));
         EX.deny(EX.false.equals(EX.true));
+
+        return true;
     }
 })();
 

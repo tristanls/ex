@@ -165,6 +165,8 @@ EX.selfTest = (function ()
         ex.deny(EX.Rule.equals(EX.Judgment));
         ex.deny(EX.Rule.equals(EX.HypotheticalJudgment));
         ex.assert(EX.Rule.equals(EX.Rule));
+
+        return true;
     }
 })();
 
