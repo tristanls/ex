@@ -118,6 +118,7 @@ EX.IsProposition = ex.Type(Object.assign({},
                 return new IsProposition(subject);
             }
             ex.assert(subject.inhabits(ex.Value));
+            this._value = subject;
             return EX.Judgment(this, EX.Conjoiner([subject]));
         }
     }
@@ -279,6 +280,36 @@ EX.selfTest = (function ()
             sameJudgment2
         );
         ex.assert(rule2.equals(rule3));
+
+        // IsProposition instance
+
+        //   inhabits only Type, Value, and Judgment types
+        const prop = EX.IsProposition(ex.Value());
+        types.filter(type =>
+                [
+                    ex.Type, ex.Value, EX.Judgment, EX.HypotheticalJudgment,
+                    EX.IsProposition, EX.IsTrue
+                ]
+                .includes(type)
+            )
+            .map(type => ex.assert(prop.inhabits(type), type.name));
+        types.filter(type =>
+                ![
+                    ex.Type, ex.Value, EX.Judgment, EX.HypotheticalJudgment,
+                    EX.IsProposition, EX.IsTrue
+                ]
+                .includes(type)
+            )
+            .map(type => ex.deny(prop.inhabits(type), type.name));
+
+        // does not equal any type
+        types.map(type => ex.deny(prop.equals(type), type.name));
+
+        const sameValue = ex.Value();
+        const prop2 = EX.IsProposition(sameValue);
+        ex.deny(prop.equals(prop2));
+        const prop3 = EX.IsProposition(sameValue);
+        ex.assert(prop2.equals(prop3));
 
         return true;
     }

@@ -53,18 +53,45 @@ const valuePrototype =
         {
             return EX.false;
         }
-        if (this._value
-            && that._value
-            && Object.keys(this._value).length === Object.keys(that._value).length)
+        if (this._value !== undefined && that._value !== undefined)
         {
-            for (let entry of Object.entries(this._value))
+            if (this._value === that._value)
             {
-                if (entry[1].equals(that._value[entry[0]]) === EX.false)
+                return EX.true;
+            }
+            if (!this._value || !that._value)
+            {
+                // One of *._value is defined but falsy. If falsy value like 0
+                // or null does not triple equal the other value, then it is
+                // not equal.
+                return EX.false;
+            }
+            if (this._value.equals !== undefined)
+            {
+                // this._value may be one of ex values
+                const exEquals = this._value.equals(that._value);
+                if (exEquals === EX.true)
+                {
+                    return EX.true;
+                }
+                else if (exEquals === EX.false)
                 {
                     return EX.false;
                 }
+                // equals returned neither EX.true nor EX.false, could be some
+                // other equals
             }
-            return EX.true;
+            if (Object.keys(this._value).length === Object.keys(that._value).length)
+            {
+                for (let entry of Object.entries(this._value))
+                {
+                    if (entry[1].equals(that._value[entry[0]]) === EX.false)
+                    {
+                        return EX.false;
+                    }
+                }
+                return EX.true;
+            }
         }
         return EX.false;
     }
