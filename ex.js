@@ -588,6 +588,11 @@ EX.selfTest = (function ()
         EX.deny(EX.false.equals(EX.null));
         EX.deny(EX.false.equals(EX.true));
 
+        // TODO: Problems to resolve
+
+        // Sum and Product constructors are indistinguishable
+        EX.assert(EX.Sum([EX.Unit]).equals(EX.Product([EX.Unit])));
+
         return true;
     }
 })();
