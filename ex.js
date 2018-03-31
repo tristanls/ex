@@ -244,6 +244,47 @@ EX.Sum = EX.Type(Object.assign({},
     }
 ));
 
+EX.Product = EX.Type(Object.assign({},
+    EX.Type.prototype,
+    {
+        constructor: function Product(types)
+        {
+            if (!(this instanceof Product))
+            {
+                return new Product(types);
+            }
+            EX.assert(EX.Boolean(Array.isArray(types)));
+            EX.assert(EX.Boolean(types.length > 0));
+            types.map(type => EX.assert(type.inhabits(EX.Type)));
+            const prototype =
+            {
+                constructor: function Constructor(values)
+                {
+                    if (!(this instanceof Constructor))
+                    {
+                        return new Constructor(values);
+                    }
+                    EX.assert(EX.Boolean(Array.isArray(values)));
+                    EX.assert(EX.Boolean(values.length === types.length));
+                    values.map((value, i) => EX.assert(value.inhabits(types[i])));
+                    this._value = values;
+                }
+            };
+            types.map((type, i) => prototype[`ordinal${i + 1}${type.name}`] = function()
+                {
+                    return this._value[i];
+                }
+            );
+            const constr = EX.Type(Object.assign({},
+                EX.Type.prototype,
+                prototype
+            ));
+            constr._value = types;
+            return constr;
+        }
+    }
+));
+
 EX.Boolean = EX.Type(Object.assign({},
     EX.Type.prototype,
     {
@@ -467,6 +508,47 @@ EX.selfTest = (function ()
         EX.deny(hasValue.equals(noValue));
         EX.deny(noValue.equals(hasValue));
         EX.deny(hasValue.equals(Option(1, EX.Value())));
+
+        // Product
+        EX.assert(EX.Product.inhabits(EX.Type));
+        EX.assert(EX.Product.inhabits(EX.Value));
+        EX.deny(EX.Product.inhabits(EX.Void));
+        EX.assert(EX.Product.inhabits(EX.Unit));
+
+        const MyProd = EX.Product([EX.Unit, EX.Unit, EX.Unit]);
+        EX.assert(MyProd.inhabits(EX.Type));
+        EX.assert(MyProd.inhabits(EX.Value));
+        EX.assert(MyProd.inhabits(EX.Unit));
+        EX.deny(MyProd.inhabits(EX.Void));
+        const myProd = MyProd([EX.null, EX.null, EX.null]);
+        const myProd2 = MyProd([EX.null, EX.null, EX.null]);
+        EX.assert(myProd.equals(myProd));
+        EX.assert(myProd.equals(myProd2));
+
+        // Pair from Product
+        const Pair = EX.Product([EX.Value, EX.Value]);
+        EX.assert(Pair.inhabits(EX.Type));
+        EX.assert(Pair.inhabits(EX.Value));
+        EX.assert(Pair.inhabits(EX.Product));
+        EX.deny(Pair.inhabits(EX.Void));
+        EX.assert(Pair.inhabits(EX.Unit));
+
+        EX.assert(Pair.equals(EX.Product([EX.Value, EX.Value])));
+        EX.deny(Pair.equals(EX.Product([EX.Value, EX.Unit])));
+
+        const val1 = EX.Value();
+        const pair = Pair([val1, EX.Value()]);
+        const pair2 = Pair([EX.Value(), EX.Value()]);
+        EX.assert(pair.equals(pair));
+        EX.assert(pair2.equals(pair2));
+        EX.deny(pair.equals(pair2));
+        const pair3 = Pair([EX.null, EX.null]);
+        const pair4 = Pair([EX.null, EX.null]);
+        EX.assert(pair3.equals(pair4));
+        EX.deny(pair.equals(pair3));
+        EX.assert(pair3.ordinal1Value().equals(EX.null));
+        EX.assert(pair3.ordinal2Value().equals(EX.null));
+        EX.assert(pair.ordinal1Value().equals(val1));
 
         // Boolean
         EX.assert(EX.Boolean.inhabits(EX.Type));
