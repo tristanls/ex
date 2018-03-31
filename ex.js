@@ -590,8 +590,16 @@ EX.selfTest = (function ()
 
         // TODO: Problems to resolve
 
+        // Boolean type is indistinguishible
+        EX.assert(EX.Boolean.inhabits(EX.Boolean));
+
         // Sum and Product constructors are indistinguishable
+        EX.assert(EX.Sum.inhabits(EX.Product));
+        EX.assert(EX.Sum([EX.Unit]).inhabits(EX.Product));
         EX.assert(EX.Sum([EX.Unit]).equals(EX.Product([EX.Unit])));
+        EX.assert(EX.Product.inhabits(EX.Sum));
+        EX.assert(EX.Product([EX.Unit]).inhabits(EX.Sum));
+        EX.assert(EX.Product([EX.Unit]).equals(EX.Sum([EX.Unit])));
 
         return true;
     }
