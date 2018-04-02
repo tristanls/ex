@@ -262,6 +262,8 @@ EX.Sum = EX.Type(Object.assign({},
             };
             // Injector inhabitance is determined by what can be done to an
             // Injector, which is, inject specific value at specific ordinal.
+            // Injection happens on instance construction, methods are here for
+            // inhabitance determination.
             types.map((type, i) => prototype[`inject${i + 1}${type.name}`] = function () {});
             const injector = EX.Type(Object.assign({},
                 EX.Type.prototype,
