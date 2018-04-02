@@ -233,9 +233,12 @@ EX.Sum = EX.Type(Object.assign({},
             {
                 return new Sum(types);
             }
-            EX.assert(EX.Boolean(Array.isArray(types)));
-            EX.assert(EX.Boolean(types.length > 0));
-            types.map(type => EX.assert(type.inhabits(EX.Type)));
+            if (EX.Boolean !== undefined)
+            {
+                EX.assert(EX.boolFrom(Array.isArray(types)));
+                EX.assert(EX.boolFrom(types.length > 0));
+                types.map(type => EX.assert(type.inhabits(EX.Type)));
+            }
             const maxOrdinal = types.length;
             const prototype =
             {
@@ -245,16 +248,29 @@ EX.Sum = EX.Type(Object.assign({},
                     {
                         return new Injector(ordinal, value);
                     }
-                    ordinal = parseInt(ordinal);
-                    EX.assert(EX.Boolean(ordinal > 0 && ordinal <= maxOrdinal));
-                    EX.assert(value.inhabits(types[ordinal - 1]));
+                    if (EX.Boolean !== undefined)
+                    {
+                        ordinal = parseInt(ordinal);
+                        EX.assert(EX.boolFrom(ordinal > 0 && ordinal <= maxOrdinal));
+                        EX.assert(value.inhabits(types[ordinal - 1]));
+                    }
                     this._value =
                     {
                         occupant: value,
                         ordinal:
                         {
                             // hack for equality until we have EX.Number
-                            equals: that => that._value === ordinal,
+                            equals: that =>
+                            {
+                                if (that._value === ordinal)
+                                {
+                                    return EX.true;
+                                }
+                                else
+                                {
+                                    return EX.false;
+                                }
+                            },
                             _value: ordinal
                         }
                     };
@@ -279,6 +295,12 @@ EX.Sum = EX.Type(Object.assign({},
     }
 ));
 
+const boolean = EX.Sum([EX.Unit, EX.Unit]);
+EX.true = boolean(1, EX.null);
+EX.false = boolean(2, EX.null);
+EX.Boolean = boolean;
+EX.boolFrom = value => value ? EX.true : EX.false;
+
 EX.Product = EX.Type(Object.assign({},
     EX.Type.prototype,
     {
@@ -288,8 +310,8 @@ EX.Product = EX.Type(Object.assign({},
             {
                 return new Product(types);
             }
-            EX.assert(EX.Boolean(Array.isArray(types)));
-            EX.assert(EX.Boolean(types.length > 0));
+            EX.assert(EX.boolFrom(Array.isArray(types)));
+            EX.assert(EX.boolFrom(types.length > 0));
             types.map(type => EX.assert(type.inhabits(EX.Type)));
             const prototype =
             {
@@ -299,8 +321,8 @@ EX.Product = EX.Type(Object.assign({},
                     {
                         return new Constructor(values);
                     }
-                    EX.assert(EX.Boolean(Array.isArray(values)));
-                    EX.assert(EX.Boolean(values.length === types.length));
+                    EX.assert(EX.boolFrom(Array.isArray(values)));
+                    EX.assert(EX.boolFrom(values.length === types.length));
                     values.map((value, i) => EX.assert(value.inhabits(types[i])));
                     this._value = values;
                 }
@@ -326,39 +348,6 @@ EX.Product = EX.Type(Object.assign({},
     }
 ));
 
-EX.Boolean = EX.Type(Object.assign({},
-    EX.Type.prototype,
-    {
-        constructor: function Boolean(value)
-        {
-            if (!(this instanceof Boolean))
-            {
-                return new Boolean(value);
-            }
-            if (value)
-            {
-                if (EX.true === undefined)
-                {
-                    this._value = true;
-                    EX.true = EX.deepFreeze(this);
-                }
-                return EX.true;
-            }
-            else
-            {
-                if (EX.false === undefined)
-                {
-                    this._value = false;
-                    EX.false = EX.deepFreeze(this);
-                }
-                return EX.false;
-            }
-        }
-    }
-));
-EX.true = EX.Boolean(true);
-EX.false = EX.Boolean(false);
-
 EX.selfTest = (function ()
 {
     const type = EX.Type();
@@ -370,22 +359,25 @@ EX.selfTest = (function ()
         EX.assert(EX.Type.inhabits(EX.Value));
         EX.deny(EX.Type.inhabits(EX.Void));
         EX.assert(EX.Type.inhabits(EX.Unit));
-        // TODO: Boolean type is currently indistinguishable
-        // EX.deny(EX.Type.inhabits(EX.Boolean));
+        EX.deny(EX.Type.inhabits(EX.Boolean));
+        EX.deny(EX.Type.inhabits(EX.Sum));
+        EX.deny(EX.Type.inhabits(EX.Product));
 
         EX.assert(EX.Type.equals(EX.Type));
         EX.deny(EX.Type.equals(EX.Value));
         EX.deny(EX.Type.equals(EX.Void));
         EX.deny(EX.Type.equals(EX.Unit));
-        // TODO: Boolean type is currently indistinguishable
-        // EX.deny(EX.Type.equals(EX.Boolean));
+        EX.deny(EX.Type.equals(EX.Boolean));
+        EX.deny(EX.Type.equals(EX.Sum));
+        EX.deny(EX.Type.equals(EX.Product));
 
         EX.assert(type.inhabits(EX.Type));
         EX.assert(type.inhabits(EX.Value));
         EX.deny(type.inhabits(EX.Void));
         EX.assert(type.inhabits(EX.Unit));
-        // TODO: Boolean type is currently indistinguishable
-        // EX.deny(type.inhabits(EX.Boolean));
+        EX.deny(type.inhabits(EX.Boolean));
+        EX.deny(type.inhabits(EX.Sum));
+        EX.deny(type.inhabits(EX.Product));
 
         EX.assert(type.equals(type));
         EX.deny(type.equals(value));
@@ -398,22 +390,25 @@ EX.selfTest = (function ()
         EX.assert(EX.Value.inhabits(EX.Value));
         EX.deny(EX.Value.inhabits(EX.Void));
         EX.assert(EX.Value.inhabits(EX.Unit));
-        // TODO: Boolean type is currently indistinguishable
-        // EX.deny(EX.Value.inhabits(EX.Boolean));
+        EX.deny(EX.Value.inhabits(EX.Boolean));
+        EX.deny(EX.Value.inhabits(EX.Sum));
+        EX.deny(EX.Value.inhabits(EX.Product));
 
         EX.assert(EX.Value.equals(EX.Value));
         EX.deny(EX.Value.equals(EX.Type));
         EX.deny(EX.Value.equals(EX.Void));
         EX.deny(EX.Value.equals(EX.Unit));
-        // TODO: Boolean type is currently indistinguishable
-        // EX.deny(EX.Value.equals(EX.Boolean));
+        EX.deny(EX.Value.equals(EX.Boolean));
+        EX.deny(EX.Value.equals(EX.Sum));
+        EX.deny(EX.Value.equals(EX.Product));
 
         EX.assert(value.inhabits(EX.Type));
         EX.assert(value.inhabits(EX.Value));
         EX.deny(value.inhabits(EX.Void));
         EX.assert(value.inhabits(EX.Unit));
-        // TODO: Boolean type is currently indistinguishable
-        // EX.deny(value.inhabits(EX.Boolean));
+        EX.deny(value.inhabits(EX.Boolean));
+        EX.deny(value.inhabits(EX.Sum));
+        EX.deny(value.inhabits(EX.Product));
 
         EX.assert(value.equals(value));
         EX.deny(value.equals(type));
@@ -426,37 +421,42 @@ EX.selfTest = (function ()
         EX.assert(EX.Void.inhabits(EX.Value));
         EX.deny(EX.Void.inhabits(EX.Void));
         EX.assert(EX.Void.inhabits(EX.Unit));
-        // TODO: Boolean type is currently indistinguishable
-        // EX.deny(EX.Void.inhabits(EX.Boolean));
+        EX.deny(EX.Void.inhabits(EX.Boolean));
+        EX.deny(EX.Void.inhabits(EX.Sum));
+        EX.deny(EX.Void.inhabits(EX.Product));
 
         EX.assert(EX.Void.equals(EX.Void));
         EX.deny(EX.Void.equals(EX.Type));
         EX.deny(EX.Void.equals(EX.Value));
         EX.deny(EX.Void.equals(EX.Unit));
-        // TODO: Boolean type is currently indistinguishable
-        // EX.deny(EX.Void.equals(EX.Boolean));
+        EX.deny(EX.Void.equals(EX.Boolean));
+        EX.deny(EX.Void.equals(EX.Sum));
+        EX.deny(EX.Void.equals(EX.Product));
 
         // Unit
         EX.assert(EX.Unit.inhabits(EX.Type));
         EX.assert(EX.Unit.inhabits(EX.Value));
         EX.deny(EX.Unit.inhabits(EX.Void));
         EX.assert(EX.Unit.inhabits(EX.Unit));
-        // TODO: Boolean type is currently indistinguishable
-        // EX.deny(EX.Unit.inhabits(EX.Boolean));
+        EX.deny(EX.Unit.inhabits(EX.Boolean));
+        EX.deny(EX.Unit.inhabits(EX.Sum));
+        EX.deny(EX.Unit.inhabits(EX.Product));
 
         EX.assert(EX.Unit.equals(EX.Unit));
         EX.deny(EX.Unit.equals(EX.Type));
         EX.deny(EX.Unit.equals(EX.Value));
         EX.deny(EX.Unit.equals(EX.Void));
-        // TODO: Boolean type is currently indistinguishable
-        // EX.deny(EX.Unit.equals(EX.Boolean));
+        EX.deny(EX.Unit.equals(EX.Boolean));
+        EX.deny(EX.Unit.equals(EX.Sum));
+        EX.deny(EX.Unit.equals(EX.Product));
 
         EX.assert(EX.null.inhabits(EX.Type));
         EX.assert(EX.null.inhabits(EX.Value));
         EX.assert(EX.null.inhabits(EX.Unit));
         EX.deny(EX.null.inhabits(EX.Void));
-        // TODO: Boolean type is currently indistinguishable
-        // EX.deny(EX.null.inhabits(EX.Boolean));
+        EX.deny(EX.null.inhabits(EX.Boolean));
+        EX.deny(EX.null.inhabits(EX.Sum));
+        EX.deny(EX.null.inhabits(EX.Product));
 
         EX.assert(EX.null.equals(EX.null));
         EX.deny(EX.null.equals(type));
@@ -469,6 +469,9 @@ EX.selfTest = (function ()
         EX.assert(EX.Sum.inhabits(EX.Value));
         EX.deny(EX.Sum.inhabits(EX.Void));
         EX.assert(EX.Sum.inhabits(EX.Unit));
+        EX.deny(EX.Sum.inhabits(EX.Boolean));
+        EX.deny(EX.Sum.inhabits(EX.Sum));
+        EX.deny(EX.Sum.inhabits(EX.Product));
 
         const MyType = EX.Sum([EX.Unit, EX.Unit, EX.Unit]);
         const MyType2 = EX.Sum([MyType, MyType]);
@@ -489,6 +492,7 @@ EX.selfTest = (function ()
         EX.assert(Boolean.inhabits(EX.Unit));
 
         EX.assert(Boolean.equals(EX.Sum([EX.Unit, EX.Unit])));
+        EX.assert(Boolean.equals(EX.Boolean));
         EX.deny(Boolean.equals(EX.Sum([EX.Unit, EX.Value])));
 
         const _true = Boolean(1, EX.null);
@@ -558,6 +562,9 @@ EX.selfTest = (function ()
         EX.assert(EX.Product.inhabits(EX.Value));
         EX.deny(EX.Product.inhabits(EX.Void));
         EX.assert(EX.Product.inhabits(EX.Unit));
+        EX.deny(EX.Product.inhabits(EX.Boolean));
+        EX.deny(EX.Product.inhabits(EX.Sum));
+        EX.deny(EX.Product.inhabits(EX.Product));
 
         const MyProd = EX.Product([EX.Unit, EX.Unit, EX.Unit]);
         EX.assert(MyProd.inhabits(EX.Type));
@@ -602,8 +609,7 @@ EX.selfTest = (function ()
         EX.assert(EX.Boolean.inhabits(EX.Value));
         EX.deny(EX.Boolean.inhabits(EX.Void));
         EX.assert(EX.Boolean.inhabits(EX.Unit));
-        // TODO: Boolean type is currently indistinguishable
-        // EX.deny(EX.Boolean.inhabits(EX.Boolean));
+        EX.deny(EX.Boolean.inhabits(EX.Boolean));
 
         EX.assert(EX.Boolean.equals(EX.Boolean));
         EX.deny(EX.Boolean.equals(EX.Type));
@@ -642,11 +648,7 @@ EX.selfTest = (function ()
         EX.deny(EX.Sum([EX.Unit]).inhabits(EX.Product));
         EX.deny(EX.Product.inhabits(EX.Sum));
         EX.deny(EX.Product([EX.Unit]).inhabits(EX.Sum));
-
-        // TODO: Problems to resolve
-
-        // Boolean type is indistinguishible
-        EX.assert(EX.Boolean.inhabits(EX.Boolean));
+        EX.deny(EX.Boolean.inhabits(EX.Boolean));
 
         return true;
     }
