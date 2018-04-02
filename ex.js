@@ -42,6 +42,7 @@ const valuePrototype =
         {
             return new Value();
         }
+        this._value = this;
     },
     // TODO: maybe separate equals from equivalent?
     equals(that)
@@ -69,6 +70,18 @@ const valuePrototype =
             }
             if (this._value.equals !== undefined)
             {
+                // short circuit infinite recursion of circular self-reference
+                if (this._value === this)
+                {
+                    if (this._value === that._value)
+                    {
+                        return EX.true;
+                    }
+                    else
+                    {
+                        return EX.false;
+                    }
+                }
                 // this._value may be one of ex values
                 const exEquals = this._value.equals(that._value);
                 if (exEquals === EX.true)
@@ -120,6 +133,7 @@ const typePrototype =
         }
         if (prototype === undefined)
         {
+            this._value = this;
             return;
         }
         const newType = Object.assign({},
