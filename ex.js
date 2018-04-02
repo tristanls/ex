@@ -237,19 +237,6 @@ EX.Sum = EX.Type(Object.assign({},
             EX.assert(EX.Boolean(types.length > 0));
             types.map(type => EX.assert(type.inhabits(EX.Type)));
             const maxOrdinal = types.length;
-            const inject = function(ordinal, value)
-            {
-                this._value =
-                {
-                    occupant: value,
-                    ordinal:
-                    {
-                        // hack for equality until we have EX.Number
-                        equals: that => that._value === ordinal,
-                        _value: ordinal
-                    }
-                };
-            };
             const prototype =
             {
                 constructor: function Injector(ordinal, value)
@@ -261,12 +248,21 @@ EX.Sum = EX.Type(Object.assign({},
                     ordinal = parseInt(ordinal);
                     EX.assert(EX.Boolean(ordinal > 0 && ordinal <= maxOrdinal));
                     EX.assert(value.inhabits(types[ordinal - 1]));
-                    this[`inject${ordinal}${types[ordinal - 1].name}`](ordinal, value);
+                    this._value =
+                    {
+                        occupant: value,
+                        ordinal:
+                        {
+                            // hack for equality until we have EX.Number
+                            equals: that => that._value === ordinal,
+                            _value: ordinal
+                        }
+                    };
                 }
             };
             // Injector inhabitance is determined by what can be done to an
             // Injector, which is, inject specific value at specific ordinal.
-            types.map((type, i) => prototype[`inject${i + 1}${type.name}`] = inject);
+            types.map((type, i) => prototype[`inject${i + 1}${type.name}`] = function () {});
             const injector = EX.Type(Object.assign({},
                 EX.Type.prototype,
                 prototype
