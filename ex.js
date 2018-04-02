@@ -237,6 +237,19 @@ EX.Sum = EX.Type(Object.assign({},
             EX.assert(EX.Boolean(types.length > 0));
             types.map(type => EX.assert(type.inhabits(EX.Type)));
             const maxOrdinal = types.length;
+            const inject = function(ordinal, value)
+            {
+                this._value =
+                {
+                    occupant: value,
+                    ordinal:
+                    {
+                        // hack for equality until we have EX.Number
+                        equals: that => that._value === ordinal,
+                        _value: ordinal
+                    }
+                };
+            };
             const prototype =
             {
                 constructor: function Injector(ordinal, value)
@@ -248,19 +261,12 @@ EX.Sum = EX.Type(Object.assign({},
                     ordinal = parseInt(ordinal);
                     EX.assert(EX.Boolean(ordinal > 0 && ordinal <= maxOrdinal));
                     EX.assert(value.inhabits(types[ordinal - 1]));
-                    this._value =
-                    {
-                        occupant: value,
-                        ordinal:
-                        {
-                            // hack for equality until we have EX.Number
-                            equals: that => that._value === ordinal,
-                            _value: ordinal
-                        }
-                    }
+                    this[`inject${ordinal}${types[ordinal - 1].name}`](ordinal, value);
                 }
             };
-            types.map((type, i) => prototype[`ordinal${i + 1}${type.name}`] = function () {});
+            // Injector inhabitance is determined by what can be done to an
+            // Injector, which is, inject specific value at specific ordinal.
+            types.map((type, i) => prototype[`inject${i + 1}${type.name}`] = inject);
             const injector = EX.Type(Object.assign({},
                 EX.Type.prototype,
                 prototype
@@ -301,6 +307,8 @@ EX.Product = EX.Type(Object.assign({},
                     this._value = values;
                 }
             };
+            // Product inhabitance is determined by what can be done to a Product,
+            // which is, retrieve value at specified ordinal.
             types.map((type, i) => prototype[`ordinal${i + 1}${type.name}`] = function()
                 {
                     return this._value[i];
@@ -491,6 +499,7 @@ EX.selfTest = (function ()
         EX.deny(_true.inhabits(EX.Void));
         EX.assert(_true.inhabits(EX.Unit));
         EX.assert(_true.inhabits(EX.Sum([EX.Unit, EX.Unit])));
+        EX.deny(_true.inhabits(EX.Product([EX.Unit, EX.Unit])));
         EX.assert(_true.inhabits(Boolean));
 
         const _false = Boolean(2, EX.null);
@@ -499,6 +508,7 @@ EX.selfTest = (function ()
         EX.deny(_false.inhabits(EX.Void));
         EX.assert(_false.inhabits(EX.Unit));
         EX.assert(_false.inhabits(EX.Sum([EX.Unit, EX.Unit])));
+        EX.deny(_false.inhabits(EX.Product([EX.Unit, EX.Unit])));
         EX.assert(_false.inhabits(Boolean));
 
         EX.assert(_true.equals(_true));
@@ -576,6 +586,7 @@ EX.selfTest = (function ()
         const val1 = EX.Value();
         const pair = Pair([val1, EX.Value()]);
         EX.assert(pair.inhabits(EX.Product([EX.Value, EX.Value])));
+        EX.deny(pair.inhabits(EX.Sum([EX.Value, EX.Value])));
         const pair2 = Pair([EX.Value(), EX.Value()]);
         EX.assert(pair.equals(pair));
         EX.assert(pair2.equals(pair2));
