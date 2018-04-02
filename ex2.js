@@ -13,7 +13,7 @@ EX.Conjoiner = ex.Type(Object.assign({},
             {
                 return new Conjoiner(value);
             }
-            ex.assert(ex.Boolean(Array.isArray(value)));
+            ex.assert(ex.boolFrom(Array.isArray(value)));
             this._value = value;
         },
         join(value)
