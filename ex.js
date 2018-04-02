@@ -43,6 +43,7 @@ const valuePrototype =
             return new Value();
         }
     },
+    // TODO: maybe separate equals from equivalent?
     equals(that)
     {
         if (this === that)
@@ -85,7 +86,19 @@ const valuePrototype =
             {
                 for (let entry of Object.entries(this._value))
                 {
-                    if (entry[1].equals(that._value[entry[0]]) !== EX.true)
+                    // short circuit infinite recursion of circular self-reference
+                    if (this === entry[1])
+                    {
+                        if (entry[1] === that._value[entry[0]])
+                        {
+                            return EX.true;
+                        }
+                        else
+                        {
+                            return EX.false;
+                        }
+                    }
+                    else if (entry[1].equals(that._value[entry[0]]) !== EX.true)
                     {
                         return EX.false;
                     }
