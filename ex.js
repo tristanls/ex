@@ -270,7 +270,8 @@ EX.Sum = EX.Type(Object.assign({},
             // This is encoded by prepending EX.Sum to list of types.
             injector._value = [ EX.Sum, ...types ];
             return injector;
-        }
+        },
+        constructorSum() {}
     }
 ));
 
@@ -314,7 +315,8 @@ EX.Product = EX.Type(Object.assign({},
             // This is encoded by prepending EX.Product to list of types.
             constr._value = [ EX.Product, ...types ];
             return constr;
-        }
+        },
+        constructorProduct() {}
     }
 ));
 
@@ -475,7 +477,8 @@ EX.selfTest = (function ()
         const Boolean = EX.Sum([EX.Unit, EX.Unit]);
         EX.assert(Boolean.inhabits(EX.Type));
         EX.assert(Boolean.inhabits(EX.Value));
-        EX.assert(Boolean.inhabits(EX.Sum));
+        EX.deny(Boolean.inhabits(EX.Sum));
+        EX.deny(Boolean.inhabits(EX.Sum([EX.Unit, EX.Unit])));
         EX.deny(Boolean.inhabits(EX.Void));
         EX.assert(Boolean.inhabits(EX.Unit));
 
@@ -514,7 +517,7 @@ EX.selfTest = (function ()
         const Option = EX.Sum([EX.Value, EX.Unit]);
         EX.assert(Option.inhabits(EX.Type));
         EX.assert(Option.inhabits(EX.Value));
-        EX.assert(Option.inhabits(EX.Sum));
+        EX.deny(Option.inhabits(EX.Sum));
         EX.deny(Option.inhabits(EX.Void));
         EX.assert(Option.inhabits(EX.Unit));
 
@@ -562,7 +565,8 @@ EX.selfTest = (function ()
         const Pair = EX.Product([EX.Value, EX.Value]);
         EX.assert(Pair.inhabits(EX.Type));
         EX.assert(Pair.inhabits(EX.Value));
-        EX.assert(Pair.inhabits(EX.Product));
+        EX.deny(Pair.inhabits(EX.Product));
+        EX.deny(Pair.inhabits(EX.Product([EX.Value, EX.Value])));
         EX.deny(Pair.inhabits(EX.Void));
         EX.assert(Pair.inhabits(EX.Unit));
 
@@ -571,6 +575,7 @@ EX.selfTest = (function ()
 
         const val1 = EX.Value();
         const pair = Pair([val1, EX.Value()]);
+        EX.assert(pair.inhabits(EX.Product([EX.Value, EX.Value])));
         const pair2 = Pair([EX.Value(), EX.Value()]);
         EX.assert(pair.equals(pair));
         EX.assert(pair2.equals(pair2));
@@ -624,17 +629,15 @@ EX.selfTest = (function ()
         // Resolved problems
         EX.deny(EX.Sum([EX.Unit]).equals(EX.Product([EX.Unit])));
         EX.deny(EX.Product([EX.Unit]).equals(EX.Sum([EX.Unit])));
+        EX.deny(EX.Sum.inhabits(EX.Product));
+        EX.deny(EX.Sum([EX.Unit]).inhabits(EX.Product));
+        EX.deny(EX.Product.inhabits(EX.Sum));
+        EX.deny(EX.Product([EX.Unit]).inhabits(EX.Sum));
 
         // TODO: Problems to resolve
 
         // Boolean type is indistinguishible
         EX.assert(EX.Boolean.inhabits(EX.Boolean));
-
-        // Sum and Product constructors are indistinguishable
-        EX.assert(EX.Sum.inhabits(EX.Product));
-        EX.assert(EX.Sum([EX.Unit]).inhabits(EX.Product));
-        EX.assert(EX.Product.inhabits(EX.Sum));
-        EX.assert(EX.Product([EX.Unit]).inhabits(EX.Sum));
 
         return true;
     }
