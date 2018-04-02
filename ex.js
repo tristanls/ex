@@ -352,6 +352,8 @@ EX.Product = EX.Type(Object.assign({},
     }
 ));
 
+EX.Pair = EX.Product([EX.Value, EX.Value]);
+
 EX.selfTest = (function ()
 {
     const type = EX.Type();
@@ -580,27 +582,26 @@ EX.selfTest = (function ()
         EX.assert(myProd.equals(myProd2));
 
         // Pair from Product
-        const Pair = EX.Product([EX.Value, EX.Value]);
-        EX.assert(Pair.inhabits(EX.Type));
-        EX.assert(Pair.inhabits(EX.Value));
-        EX.deny(Pair.inhabits(EX.Product));
-        EX.deny(Pair.inhabits(EX.Product([EX.Value, EX.Value])));
-        EX.deny(Pair.inhabits(EX.Void));
-        EX.assert(Pair.inhabits(EX.Unit));
+        EX.assert(EX.Pair.inhabits(EX.Type));
+        EX.assert(EX.Pair.inhabits(EX.Value));
+        EX.deny(EX.Pair.inhabits(EX.Product));
+        EX.deny(EX.Pair.inhabits(EX.Product([EX.Value, EX.Value])));
+        EX.deny(EX.Pair.inhabits(EX.Void));
+        EX.assert(EX.Pair.inhabits(EX.Unit));
 
-        EX.assert(Pair.equals(EX.Product([EX.Value, EX.Value])));
-        EX.deny(Pair.equals(EX.Product([EX.Value, EX.Unit])));
+        EX.assert(EX.Pair.equals(EX.Product([EX.Value, EX.Value])));
+        EX.deny(EX.Pair.equals(EX.Product([EX.Value, EX.Unit])));
 
         const val1 = EX.Value();
-        const pair = Pair([val1, EX.Value()]);
+        const pair = EX.Pair([val1, EX.Value()]);
         EX.assert(pair.inhabits(EX.Product([EX.Value, EX.Value])));
         EX.deny(pair.inhabits(EX.Sum([EX.Value, EX.Value])));
-        const pair2 = Pair([EX.Value(), EX.Value()]);
+        const pair2 = EX.Pair([EX.Value(), EX.Value()]);
         EX.assert(pair.equals(pair));
         EX.assert(pair2.equals(pair2));
         EX.deny(pair.equals(pair2));
-        const pair3 = Pair([EX.null, EX.null]);
-        const pair4 = Pair([EX.null, EX.null]);
+        const pair3 = EX.Pair([EX.null, EX.null]);
+        const pair4 = EX.Pair([EX.null, EX.null]);
         EX.assert(pair3.equals(pair4));
         EX.deny(pair.equals(pair3));
         EX.assert(pair3.ordinal1Value().equals(EX.null));
