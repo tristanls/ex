@@ -265,7 +265,10 @@ EX.Sum = EX.Type(Object.assign({},
                 EX.Type.prototype,
                 prototype
             ));
-            injector._value = types;
+            // Injector equivalence is determined by `that` being an Injector
+            // which produces inhabitant of Sum with expected ordinal types.
+            // This is encoded by prepending EX.Sum to list of types.
+            injector._value = [ EX.Sum, ...types ];
             return injector;
         }
     }
@@ -306,7 +309,10 @@ EX.Product = EX.Type(Object.assign({},
                 EX.Type.prototype,
                 prototype
             ));
-            constr._value = types;
+            // Constructor equivalence is determined by `that` being a Constructor
+            // which produces inhabitant of Product with expected ordinal types.
+            // This is encoded by prepending EX.Product to list of types.
+            constr._value = [ EX.Product, ...types ];
             return constr;
         }
     }
@@ -615,6 +621,10 @@ EX.selfTest = (function ()
         EX.deny(EX.false.equals(EX.null));
         EX.deny(EX.false.equals(EX.true));
 
+        // Resolved problems
+        EX.deny(EX.Sum([EX.Unit]).equals(EX.Product([EX.Unit])));
+        EX.deny(EX.Product([EX.Unit]).equals(EX.Sum([EX.Unit])));
+
         // TODO: Problems to resolve
 
         // Boolean type is indistinguishible
@@ -623,10 +633,8 @@ EX.selfTest = (function ()
         // Sum and Product constructors are indistinguishable
         EX.assert(EX.Sum.inhabits(EX.Product));
         EX.assert(EX.Sum([EX.Unit]).inhabits(EX.Product));
-        EX.assert(EX.Sum([EX.Unit]).equals(EX.Product([EX.Unit])));
         EX.assert(EX.Product.inhabits(EX.Sum));
         EX.assert(EX.Product([EX.Unit]).inhabits(EX.Sum));
-        EX.assert(EX.Product([EX.Unit]).equals(EX.Sum([EX.Unit])));
 
         return true;
     }
