@@ -301,6 +301,10 @@ EX.false = boolean(2, EX.null);
 EX.Boolean = boolean;
 EX.boolFrom = value => value ? EX.true : EX.false;
 
+EX.Option = EX.Sum([EX.Value, EX.Unit]);
+EX.optionFrom = value => value !== undefined ? EX.Option(1, value)
+                                             : EX.Option(2, EX.null);
+
 EX.Product = EX.Type(Object.assign({},
     EX.Type.prototype,
     {
@@ -525,37 +529,36 @@ EX.selfTest = (function ()
         EX.deny(_false.equals(EX.null));
         EX.deny(_false.equals(_true));
 
-        // Option from Sum
-        const Option = EX.Sum([EX.Value, EX.Unit]);
-        EX.assert(Option.inhabits(EX.Type));
-        EX.assert(Option.inhabits(EX.Value));
-        EX.deny(Option.inhabits(EX.Sum));
-        EX.deny(Option.inhabits(EX.Void));
-        EX.assert(Option.inhabits(EX.Unit));
+        // Option
+        EX.assert(EX.Option.inhabits(EX.Type));
+        EX.assert(EX.Option.inhabits(EX.Value));
+        EX.deny(EX.Option.inhabits(EX.Sum));
+        EX.deny(EX.Option.inhabits(EX.Void));
+        EX.assert(EX.Option.inhabits(EX.Unit));
 
-        EX.assert(Option.equals(EX.Sum([EX.Value, EX.Unit])));
+        EX.assert(EX.Option.equals(EX.Sum([EX.Value, EX.Unit])));
 
-        const hasValue = Option(1, EX.Value());
+        const hasValue = EX.Option(1, EX.Value());
         EX.assert(hasValue.inhabits(EX.Type));
         EX.assert(hasValue.inhabits(EX.Value));
         EX.deny(hasValue.inhabits(EX.Void));
         EX.assert(hasValue.inhabits(EX.Unit));
         EX.assert(hasValue.inhabits(EX.Sum([EX.Value, EX.Unit])));
-        EX.assert(hasValue.inhabits(Option));
+        EX.assert(hasValue.inhabits(EX.Option));
 
-        const noValue = Option(2, EX.null);
+        const noValue = EX.Option(2, EX.null);
         EX.assert(noValue.inhabits(EX.Type));
         EX.assert(noValue.inhabits(EX.Value));
         EX.deny(noValue.inhabits(EX.Void));
         EX.assert(noValue.inhabits(EX.Unit));
         EX.assert(noValue.inhabits(EX.Sum([EX.Value, EX.Unit])));
-        EX.assert(noValue.inhabits(Option));
+        EX.assert(noValue.inhabits(EX.Option));
 
         EX.assert(hasValue.equals(hasValue));
         EX.assert(noValue.equals(noValue));
         EX.deny(hasValue.equals(noValue));
         EX.deny(noValue.equals(hasValue));
-        EX.deny(hasValue.equals(Option(1, EX.Value())));
+        EX.deny(hasValue.equals(EX.Option(1, EX.Value())));
 
         // Product
         EX.assert(EX.Product.inhabits(EX.Type));
