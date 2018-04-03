@@ -382,7 +382,7 @@ EX.Arrow = EX.Type(Object.assign({},
                 apply(args)
                 {
                     EX.assert(EX.boolFrom(args.inhabits(domain)));
-                    const result = this._value(args);
+                    const result = this._value.call({}, args);
                     EX.assert(EX.boolFrom(result.inhabits(codomain)));
                     return result;
                 }
