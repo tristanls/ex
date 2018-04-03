@@ -354,6 +354,54 @@ EX.Product = EX.Type(Object.assign({},
 
 EX.Pair = EX.Product([EX.Value, EX.Value]);
 
+EX.Arrow = EX.Type(Object.assign({},
+    EX.Type.prototype,
+    {
+        constructor: function Arrow(domain, codomain)
+        {
+            if (!(this instanceof Arrow))
+            {
+                return new Arrow(domain, codomain);
+            }
+            EX.assert(EX.boolFrom(domain.inhabits(EX.Type)));
+            EX.assert(EX.boolFrom(codomain.inhabits(EX.Type)));
+            const prototype =
+            {
+                constructor: function Constructor(map)
+                {
+                    if (!(this instanceof Constructor))
+                    {
+                        return new Constructor(map);
+                    }
+                    // As an implementation choice, we encode the map as a
+                    // JavaScript function instead of enumerating all the
+                    // mappings between domain and codomain.
+                    EX.assert(EX.boolFrom(map instanceof Function));
+                    this._value = map;
+                },
+                apply(args)
+                {
+                    EX.assert(EX.boolFrom(args.inhabits(domain)));
+                    const result = this._value(args);
+                    EX.assert(EX.boolFrom(result.inhabits(codomain)));
+                    return result;
+                }
+            };
+            const func = EX.Type(Object.assign({},
+                EX.Type.prototype,
+                prototype
+            ));
+            // Constructor equivalence is determined by `that` being a Constructor
+            // which produces inhabitant of Arrow with expected domain and
+            // codomain types. This is encoded by prepending EX.Arrow to list of
+            // domain and codomain types.
+            func._value = [ EX.Arrow, domain, codomain ];
+            return func;
+        },
+        constructorArrow() {}
+    }
+));
+
 EX.selfTest = (function ()
 {
     const type = EX.Type();
@@ -644,6 +692,30 @@ EX.selfTest = (function ()
         EX.deny(EX.false.equals(value));
         EX.deny(EX.false.equals(EX.null));
         EX.deny(EX.false.equals(EX.true));
+
+        // Arrow
+        EX.assert(EX.Arrow.inhabits(EX.Type));
+        EX.assert(EX.Arrow.inhabits(EX.Value));
+        EX.deny(EX.Arrow.inhabits(EX.Void));
+        EX.assert(EX.Arrow.inhabits(EX.Unit));
+        EX.deny(EX.Arrow.inhabits(EX.Boolean));
+        EX.deny(EX.Arrow.inhabits(EX.Sum));
+        EX.deny(EX.Arrow.inhabits(EX.Product));
+        EX.deny(EX.Arrow.inhabits(EX.Arrow));
+
+        const Tick = EX.Arrow(EX.Unit, EX.Unit);
+        EX.assert(Tick.inhabits(EX.Type));
+        EX.assert(Tick.inhabits(EX.Value));
+        EX.assert(Tick.inhabits(EX.Unit));
+        EX.deny(Tick.inhabits(EX.Void));
+        const tick = Tick(() => EX.null);
+        EX.assert(tick.inhabits(EX.Type));
+        EX.assert(tick.inhabits(EX.Value));
+        EX.assert(tick.inhabits(EX.Unit));
+        EX.assert(tick.inhabits(EX.Arrow(EX.Unit, EX.Unit)));
+        const result = tick.apply(EX.null);
+        EX.assert(result.inhabits(EX.Unit));
+        EX.assert(result.equals(EX.null));
 
         // Resolved problems
         EX.deny(EX.Sum([EX.Unit]).equals(EX.Product([EX.Unit])));
