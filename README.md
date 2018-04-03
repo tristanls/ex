@@ -51,3 +51,43 @@ In the email inbox example, a Void type means that an email hasn't arrived. You 
 In the light switch example, a Void type means that you can't see if the light is on or off, and you can't hear the flipping of the switch. It's not that you will eventually hear or see something, but not yet. It's that you will never hear or see anything. "Nothing" will happen. Void is the absence of any signal.
 
 We now have some understanding of other types that can help us understand the nature of Void type. Imagine I have a Sum type with the shape of Void + Unit. "Void + Unit" means that the Sum type has *only one space*, and it is only the second space. There is no first space in Void + Unit type. How many things can you represent using Void + Unit type? It isn't zero plus one, but just one. If it was zero plus one, that would mean that you could put zero things into the first space, but *there is no first space*. There is only second space, into which you can put one thing. Void type isn't the same thing as zero. To see this, consider a Product type of Void x Unit. How many things can you represent using Void x Unit type? It is not zero times one, which would be zero. You can represent one thing, because you can put "something" into the second space. The first space doesn't exist, it is of type Void.
+
+### Value type
+
+A Value type can be thought of as a pattern in contrast to the Unit type pattern. Where Unit type was a "something" pattern, Value type is "this particular thing" pattern.
+
+In the email inbox example, again, by contrast, where Unit type would be a signal that some new email arrived and we only care about the signal. Value type would be saying that a particular email arrived, and while we care that email arrived, we also care about the value, the particular contents of that particular email.
+
+Another way of phrasing this, is that for a Unit type we only care about the signal. In the sentence "This thing exists", what we focus on in Unit type is *exists*. For Value type, we focus on the entire sentence *this thing exists*, because we are trying to express the pattern that particular thing not only exists, but that it is a particular thing.
+
+For example, think of the boolean True. Looking at True through the lens of "this particular thing", we care that it is True, and that it is not False. The value of True is True.
+
+### Type type
+
+Time to get weird.
+
+Type type expresses the pattern of "a pattern" :D. We covered multiple examples of Type type. Unit is of type Type. Sum is of type Type. Product is of type Type.
+
+There is an important concept to highlight. Earlier, we defined True and False as being of the type Boolean. What's worth highlighting is that Boolean is of type Type, but True is of type Boolean.
+
+Also, notice that the type Type is of type Type. This is because the pattern of "a pattern" fits the pattern of being "a pattern".
+
+### Everything is a Value
+
+Weirder...
+
+Recall that when we talked about the Value type, we were expressing the pattern of "this particular thing". If we have the type Boolean, and we have a particular boolean, say True, then the particular boolean True is of type Boolean, but it is also of type Value. This is because the boolean True fits the pattern of "booleans" and it fits the pattern of "particular thing". "Fitting a pattern" is referred to as "inhabiting a type". So, the boolean True inhabits the type Boolean and it inhabits the type Value. This is because it "fits the pattern of booleans" and it "fits the pattern of particular thing".
+
+### Types are Values and Values are Types
+
+Meta-weird...
+
+Types are Values. This is because Type type (a pattern of "a pattern") fits the pattern of being "a particular thing". The type Type inhabits the type Value.
+
+Values are Types. This is because Value type (a pattern of "a particular thing") fits the pattern of being "a pattern". The type Value inhabits the type Type.
+
+### Everything is a Unit
+
+Notice that the Unit type is the pattern of "something". This means that everything that exists fits the pattern of being "something", therefore everything that exists inhabits the type Unit.
+
+It is worth highlighting the interplay of Void type and Unit type. The Void type itself inhabits type Type, inhabits type Value, and inhabits type Unit, because the pattern of "nothing" fits the pattern of being "a pattern" (Type), fits the pattern of being "a particular thing" (Value), and fits the pattern of being "something" (Unit). However, notice that there is nothing that can inhabit the type Void. This is because to fit the pattern of "nothing", there can be nothing there. If there was something there, it wouldn't be nothing.
