@@ -4,23 +4,47 @@ const ex = require("./ex.js");
 
 const EX = module.exports;
 
-EX.Conjoiner = ex.Type(Object.assign({},
+EX.Collection = ex.Type(Object.assign({},
     ex.Type.prototype,
     {
-        constructor: function Conjoiner(value)
+        constructor: function Collection(type)
         {
-            if (!(this instanceof Conjoiner))
+            if (!(this instanceof Collection))
             {
-                return new Conjoiner(value);
+                return new Collection(type);
             }
-            ex.assert(ex.boolFrom(Array.isArray(value)));
-            this._value = value;
+            ex.assert(type.inhabits(ex.Type));
+            const prototype =
+            {
+                constructor: function Collection(values)
+                {
+                    if (!(this instanceof Collection))
+                    {
+                        return new Collection(values);
+                    }
+                    ex.assert(ex.boolFrom(Array.isArray(values)));
+                    values.map((value => ex.assert(value.inhabits(type))));
+                    this._value = values;
+                },
+                values()
+                {
+                    const types = this._value.map(() => type);
+                    const product = EX.Product(types);
+                    return product(this._value);
+                }
+            };
+            // TODO: Collection inhabitance implementation is unclear.
+            //       Assuming instances of Collection(Boolean) should inhabit
+            //       Collection(Value) type, how to do so with existing
+            //       inhabits
+            const constr = EX.Type(Object.assign({},
+                EX.Type.prototype,
+                prototype
+            ));
+            constr._value = [ EX.Collection, type ];
+            return constr;
         },
-        join(value)
-        {
-            ex.assert(value.inhabits(ex.Value));
-            return EX.Conjoiner(this._value.concat(value));
-        }
+        constructorCollection() {}
     }
 ));
 
@@ -34,7 +58,7 @@ EX.Judgment = ex.Type(Object.assign({},
                 return new Judgment(form, subjects);
             }
             ex.assert(form.inhabits(ex.Type));
-            ex.assert(subjects.inhabits(EX.Conjoiner));
+            ex.assert(subjects.inhabits(EX.Collection));
             subjects._value.map(subject => ex.assert(subject.inhabits(ex.Type)));
             this._value =
             {
