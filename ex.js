@@ -717,6 +717,13 @@ EX.selfTest = (function ()
         EX.assert(result.inhabits(EX.Unit));
         EX.assert(result.equals(EX.null));
 
+        // Set from Arrow
+        const Predicate = EX.Arrow(EX.Value, EX.Boolean);
+        const unitSet = Predicate(v => v.equals(EX.null));
+        EX.assert(unitSet.apply(EX.null));
+        EX.deny(unitSet.apply(EX.true));
+        EX.deny(unitSet.apply(EX.false));
+
         // Resolved problems
         EX.deny(EX.Sum([EX.Unit]).equals(EX.Product([EX.Unit])));
         EX.deny(EX.Product([EX.Unit]).equals(EX.Sum([EX.Unit])));
