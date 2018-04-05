@@ -28,8 +28,15 @@ EX.Collection = ex.Type(Object.assign({},
                 },
                 values()
                 {
+                    // TODO: need to return a sum, we can have an empty collection,
+                    //       which should end up returning ex.null, we can have
+                    //       a collection of one, which would be Product<type>,
+                    //       or we have an unknown number of values, which would
+                    //       return a Product of unknown number of types. This
+                    //       seems to require that we be able to setup a relationship
+                    //       of values result inhabits Product<type1,type2,type3> inhabits Product
                     const types = this._value.map(() => type);
-                    const product = EX.Product(types);
+                    const product = ex.Product(types);
                     return product(this._value);
                 }
             };
@@ -37,8 +44,8 @@ EX.Collection = ex.Type(Object.assign({},
             //       Assuming instances of Collection(Boolean) should inhabit
             //       Collection(Value) type, how to do so with existing
             //       inhabits
-            const constr = EX.Type(Object.assign({},
-                EX.Type.prototype,
+            const constr = ex.Type(Object.assign({},
+                ex.Type.prototype,
                 prototype
             ));
             constr._value = [ EX.Collection, type ];
@@ -58,7 +65,9 @@ EX.Judgment = ex.Type(Object.assign({},
                 return new Judgment(form, subjects);
             }
             ex.assert(form.inhabits(ex.Type));
-            ex.assert(subjects.inhabits(EX.Collection));
+            ex.assert(subjects.inhabits(EX.Collection(ex.Type)));
+            const product = subjects.values();
+            console.log(product);
             subjects._value.map(subject => ex.assert(subject.inhabits(ex.Type)));
             this._value =
             {
@@ -166,7 +175,7 @@ EX.selfTest = (function ()
 {
     const newTypes =
     [
-        EX.Conjoiner, EX.Judgment, EX.HypotheticalJudgment, EX.Rule,
+        EX.Collection, EX.Judgment, EX.HypotheticalJudgment, EX.Rule,
         EX.IsProposition, EX.IsTrue
     ];
     const types =
@@ -192,29 +201,30 @@ EX.selfTest = (function ()
             }
         );
 
-        // Conjoiner instance
+        // Collection instance
 
-        //   inhabits only Type, Value, and Conjoiner
-        const conjoiner = EX.Conjoiner([]);
-        types.filter(type => [ ex.Type, ex.Value, EX.Conjoiner ].includes(type))
-            .map(type => ex.assert(conjoiner.inhabits(type), type.name));
-        types.filter(type => ![ ex.Type, ex.Value, EX.Conjoiner ].includes(type))
-            .map(type => ex.deny(conjoiner.inhabits(type), type.name));
+        //   inhabits only Type, Value, and Collection<Type>
+        const collectionOfType = EX.Collection(ex.Type);
+        const collection = collectionOfType([]);
+        types.filter(type => [ ex.Type, ex.Value, collectionOfType ].includes(type))
+            .map(type => ex.assert(collection.inhabits(type), type.name));
+        types.filter(type => ![ ex.Type, ex.Value, collectionOfType ].includes(type))
+            .map(type => ex.deny(collection.inhabits(type), type.name));
 
         //   does not equal any type
-        types.map(type => ex.deny(conjoiner.equals(type)));
+        types.map(type => ex.deny(collection.equals(type)));
 
-        const conjoiner2 = EX.Conjoiner([ ex.Value(), ex.Value() ]);
-        ex.deny(conjoiner.equals(conjoiner2));
-        ex.assert(conjoiner.equals(conjoiner));
-        ex.assert(conjoiner2.equals(conjoiner2));
-        const conjoiner3 = EX.Conjoiner([ ex.Value(), ex.Value() ]);
-        ex.deny(conjoiner2.equals(conjoiner3));
+        const collection2 = collectionOfType([ ex.Value(), ex.Value() ]);
+        ex.deny(collection.equals(collection2));
+        ex.assert(collection.equals(collection));
+        ex.assert(collection2.equals(collection2));
+        const collection3 = collectionOfType([ ex.Value(), ex.Value() ]);
+        ex.deny(collection2.equals(collection3));
 
         // Judgment instance
 
         //   inhabits only Type, Value, and all Judgment types
-        const judgment = EX.Judgment(ex.Value(), EX.Conjoiner([]));
+        const judgment = EX.Judgment(ex.Value(), EX.Collection(ex.Type)([]));
         types.filter(type =>
                 [
                     ex.Type, ex.Value, EX.Judgment, EX.HypotheticalJudgment,

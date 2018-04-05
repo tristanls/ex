@@ -315,7 +315,7 @@ EX.Product = EX.Type(Object.assign({},
                 return new Product(types);
             }
             EX.assert(EX.boolFrom(Array.isArray(types)));
-            EX.assert(EX.boolFrom(types.length > 0));
+            EX.assert(EX.boolFrom(types.length > 0), "Cannot specify Product type with zero ordinal operands.");
             types.map(type => EX.assert(type.inhabits(EX.Type)));
             const prototype =
             {
