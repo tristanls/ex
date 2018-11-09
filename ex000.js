@@ -8,8 +8,15 @@ const EX = module.exports;
 
 EX.Value = function(value)
 {
-    // everything is a Value
-    return EX.true;
+    const re = /value:\w+/;
+    for (let key in value)
+    {
+        if (value.hasOwnProperty(key) && key.replace(/\s/g,"").match(re))
+        {
+            return EX.true;
+        }
+    }
+    return EX.false;
 };
 Object.defineProperty(EX.Value, "name", { writable: true });
 EX.Value.name = "type : Value -> Sum(Unit, Unit)";
@@ -65,11 +72,11 @@ EX.null = EX.NewUnit();
 console.log(EX.null);
 console.log(EX.null["value : Unit"] === EX.NewUnit());
 
-EX.Tuple = function(value)
+EX.Product = function(value)
 {
     const requirements =
     {
-        "value:Tuple\\(\\w+(?:,\\w+)*\\)": false,
+        "value:Product\\(\\w+(?:,\\w+)*\\)": false,
         "select:\\d+->\\w+": false
     };
     Object.keys(requirements).map(req =>
@@ -97,18 +104,15 @@ EX.Tuple = function(value)
     }
     return EX.true;
 };
-Object.defineProperty(EX.Tuple, "name", { writable: true });
-EX.Tuple.name = "type : Number -> Value";
-EX.Tuple["value : Type"] = EX.Tuple;
-EX.Tuple["tag : String"] = "Tuple";
+Object.defineProperty(EX.Product, "name", { writable: true });
+EX.Product.name = "type : Value -> Sum(Unit, Unit)";
+EX.Product["value : Type"] = EX.Product;
+EX.Product["tag : String"] = "Product";
 
-EX.NewTuple = function(...values)
+EX.NewProduct = function(...values)
 {
     const selectors = values.map((v, i) => `select : ${i+1} -> Value`);
-    const selector =
-    {
-        _values: values
-    };
+    const selector = {};
     selectors.map(s =>
         {
             selector[s] = ordinal =>
@@ -119,15 +123,15 @@ EX.NewTuple = function(...values)
                 {
                     throw new Error(`Type error: ${s} received ${ordinal} expected ${matchedOrdinal}`);
                 }
-                return selector._values[ordinal-1];
+                return values[ordinal-1];
             };
         }
     );
     return selector;
 };
-const sel = EX.NewTuple(1,2,3);
+const sel = EX.NewProduct(1,2,3);
 console.log(sel);
-console.log(EX.Tuple(sel));
+console.log(EX.Product(sel));
 console.log(sel["select : 1 -> Value"](1));
 console.log(sel["select : 2 -> Value"](2));
 console.log(sel["select : 3 -> Value"](3));
@@ -174,11 +178,10 @@ EX.Sum = function(value)
 {
     for (let key in value)
     {
-        // what operation do we do on a sum????
-        // if (value.hasOwnProperty(key) && key.replace(/\s/g,"").match(/inject:\w+->Sum\(\w+,\w+\)/))
-        // {
-        //     return EX.true;
-        // }
+        if (value.hasOwnProperty(key) && key.replace(/\s/g,"").match(/case:Product(\w+(?,\w+)*)->\w+/))
+        {
+            return EX.true;
+        }
     }
     return EX.false;
 };
@@ -196,9 +199,46 @@ EX.NewSum = function(ordinal, value, ...types)
             throw new Error(`Invalid type ${t}`);
         }
     }
-    // what operation do we do on a sum????
-    return `ordinal ${ordinal}, value ${Object.keys(value)}, types ${types.map(t => t["tag : String"]).join(", ")}`;
+    const sum =
+    {
+        [`case : Product(${types.map(t => `${t["tag : String"]} -> Value`).join(", ")}) -> Value`]: product =>
+        {
+            for (let select of Object.keys(product))
+            {
+                const matchingOrdinal = select.replace(/\s/g,"").match(/select:(\d+)->/)[1];
+                if (matchingOrdinal == ordinal)
+                {
+                    const comp =  product[select](ordinal);
+                    for (let apply of Object.keys(comp))
+                    {
+                        if (apply.replace(/\s/g,"").match(/apply:/))
+                        {
+                            return comp[apply](value);
+                        }
+                    }
+                }
+            }
+        }
+    };
+    sum[`value : Sum(${types.map(t => t["tag : String"]).join(", ")})`] = sum;
+    return sum;
 };
+let trueSum = EX.NewSum(1, EX.null, EX.Unit, EX.Unit);
+console.log("trueSum", trueSum);
+let ifTrue = EX.NewArrow(EX.Unit, EX.Sum, () => EX.true);
+let ifFalse = EX.NewArrow(EX.Unit, EX.Sum, () => EX.false);
+console.log(ifTrue);
+console.log(ifFalse);
+let prod1 = EX.NewProduct(ifTrue, ifFalse);
+console.log(prod1);
+let compTrue = trueSum["case : Product(Unit -> Value, Unit -> Value) -> Value"];
+console.log(compTrue);
+console.log("result of passing product to sum representing true:", compTrue(prod1));
+let falseSum = EX.NewSum(2, EX.null, EX.Unit, EX.Unit);
+console.log("falseSum", falseSum);
+let compFalse = falseSum["case : Product(Unit -> Value, Unit -> Value) -> Value"];
+console.log(compFalse);
+console.log("result of passing product to sum representing false:", compFalse(prod1));
 
 EX.Injector = function(value)
 {
